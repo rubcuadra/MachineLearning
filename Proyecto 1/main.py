@@ -51,7 +51,7 @@ def gradienteDescendente(x,y,theta=[0,0],alpha=0.01,iteraciones=1500):
 def calculaCosto(x,y,theta):
     return sum( math.pow( (h_t(_x,theta)-_y),2 )  for (_x,_y) in zip(x,y) )/(2*len(x))
 
-xData, yData = getDataFromFile('ex1data1.csv')
+xData, yData = getDataFromFile('datos.csv')
 
 if False: #If true es con matrix
     thetas = getThetas(xData,yData)
@@ -59,5 +59,7 @@ if False: #If true es con matrix
     graficarDatos(xData,yData,thetas)
 else:     #Else gradiente descendente
     thetas = gradienteDescendente(xData,yData)
-    calculaCosto(xData,yData,thetas)
+    costo = calculaCosto(xData,yData,thetas)
+    print ('Theta 0: %s\nTheta 1: %s'%(thetas[0] ,thetas[1]))
+    print ('Resultado funcion de costo: %s\n'%costo)
     graficarDatos(xData,yData,thetas)
