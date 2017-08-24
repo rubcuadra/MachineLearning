@@ -35,7 +35,7 @@ def h_t(_x,_thetas):
     result = 0
     for (x_,t_) in zip(_x,_thetas):
         result+= x_*t_ 
-    return result #Calcular Y usando thetas
+    return result 
 #Hacer que no considere el primer valor de las xs?
 def graficarDatos(x,y,_thetas):
     for _x,_y in zip(x,y):
