@@ -17,11 +17,14 @@ if __name__ == "__main__":
     thetasEcuacion = ecuacionNormal(xData,yData)
     print ('Thetas de la ecuacion normal ', thetasEcuacion)
     if len(xData[0]) > 1: #Se debe normalizar
-        nX, mediasX, sigma = normalizacionDeCaracteristicas(xData)
-        jHistoriaGradiente, thetasGradiente  = gradienteDescendenteMultivariable(nX,yData, alpha=0.729 ,iteraciones=1500)    
+        nX, mediasX, sigma = normalizacionDeCaracteristicas(xData)  #Normalizar X
+        nY, mediasY, sigmaY = normalizacionDeCaracteristicas(yData) #Normalizar Y
+        jHistoriaGradiente, thetasGradiente  = gradienteDescendenteMultivariable(nX,nY, alpha=0.003 ,iteraciones=1500)
         print ('Thetas usando gradiente descendente multivariable normalizado ', thetasGradiente)
-        #print ("Buena alpha: ",buscarAlfa(nX,yData)[0]) #Nos da el 0.729 buscado
         graficaError(jHistoriaGradiente)    
+
+        fixedX = np.append(np.ones((nX.shape[0],1)), nX , axis=1) #Agregar ones a X
+        print calculaCosto( fixedX , nY ,thetasGradiente)         #Comparar vs que?
     else:    
         jHistoriaGradiente, thetasGradiente  = gradienteDescendenteMultivariable(xData,yData)
         print ('Thetas usando gradiente descendente', thetasGradiente)
