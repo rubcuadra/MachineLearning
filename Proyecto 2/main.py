@@ -13,7 +13,7 @@ def buscarAlfa(xNormalizadas,Y,alpha=0.001,iteraciones=50, multiplicador=3):
 
 if __name__ == "__main__":
     #Leer archivos
-    xData, yData = getDataFromFile('datos2.csv')
+    xData, yData = getDataFromFile('datos.csv')
     thetasEcuacion = ecuacionNormal(xData,yData)
     print ('Thetas de la ecuacion normal ', thetasEcuacion)
     if len(xData[0]) > 1: #Se debe normalizar
@@ -21,8 +21,7 @@ if __name__ == "__main__":
         jHistoriaGradiente, thetasGradiente  = gradienteDescendenteMultivariable(nX,yData, alpha=0.729 ,iteraciones=1500)    
         print ('Thetas usando gradiente descendente multivariable normalizado ', thetasGradiente)
         #print ("Buena alpha: ",buscarAlfa(nX,yData)[0]) #Nos da el 0.729 buscado
-        graficaError(jHistoriaGradienteNormalizado)    
+        graficaError(jHistoriaGradiente)    
     else:    
         jHistoriaGradiente, thetasGradiente  = gradienteDescendenteMultivariable(xData,yData)
         print ('Thetas usando gradiente descendente', thetasGradiente)
-

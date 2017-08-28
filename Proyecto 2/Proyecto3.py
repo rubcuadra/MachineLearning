@@ -16,8 +16,9 @@ def getDataFromFile(filename):
 def normalizarMedia(vector): #Vector con valores de X
     media = vector.mean()
     rango = vector.max() - vector.min()             
+    sigma = vector.std()
     f = np.vectorize( lambda xi: (xi-media)/rango   ) #Normalizar
-    return f(vector)      #Evalua cada valor del vector
+    return f(vector)                                  #Evalua cada valor del vector
 
 #Recibe una matrix X y regresa:
 #   Una matrix _X normalizada usando la media por columna
