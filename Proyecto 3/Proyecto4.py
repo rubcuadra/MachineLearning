@@ -63,6 +63,31 @@ def aprende(theta,X,Y,iteraciones=1500):
         tempThetas = theta.copy() #Thetas temporales
         for j in range(0, len(tempThetas) ):
             #FORMULA thetaI = thetaI-(1/m)*sum( (sigmoidal(hip(xi))-yi)*x[j]i  )
-            tempThetas[j] = theta[j] - (1/m)*sum( ( sigmoidal(hipothesis(_x,theta)) -_y )*_x[j] for (_x,_y) in zip(fixedX,Y) )
+            s = sum( ( sigmoidal(hipothesis(_x,theta)) -_y )*_x[j] for (_x,_y) in zip(fixedX,Y) )
+            tempThetas[j] = theta[j] - (s/m)
         theta = tempThetas
     return theta
+
+def predice(theta,X):
+    if type(X).__module__ != np.__name__: X = np.array(X)
+    if type(theta).__module__ != np.__name__: theta = np.array(theta)
+    
+    return sigmoidal( hipothesis( np.append([1],X) ,theta) ) 
+
+def normalizarMedia(vector): #Vector con valores de X
+    media = vector.mean()
+    #rango = vector.max() - vector.min()             
+    sigma = vector.std()
+    f = np.vectorize( lambda xi: (xi-media)/sigma   ) #Normalizar
+    return f(vector)                                  #Evalua cada valor del vector
+
+#Recibe una matrix X y regresa:
+#   Una matrix _X normalizada usando la media por columna
+#   Un vector mu que contiene las medias de cada columna
+#   Un vector sigma que contiene las deviaciones estandares por columna
+def normalizacionDeCaracteristicas(X): #VALIDAR SI mu y sigma SON DEL _X o X
+    if type(X).__module__ != np.__name__: X = np.array(X)
+    _X = np.apply_along_axis( normalizarMedia , 0, X) #Normalizar por cada columna de X
+    mu = np.mean(X,axis=0)                            #Vector con medias
+    sigma = np.std(X,axis=0)                          #Deviaciones estandares
+    return (_X,mu,sigma)
