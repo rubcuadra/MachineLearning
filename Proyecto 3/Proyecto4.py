@@ -21,7 +21,7 @@ def hipothesis(vX,thetas):
 #La funcion sigmoidal esta dada por 1/(1 + e^(-z))
 #Donde z es el resultado de la hipothesis thetaT*x
 def sigmoidal(z):
-    return 1/(1 + np.e**(-z))
+    return 1.0/(1.0+np.e**(-z))
 
 #X y Y son vectores de misma size
 #Thetas tiene size == cols de X
@@ -71,9 +71,8 @@ def aprende(theta,X,Y,iteraciones=1500):
 def predice(theta,X):
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(theta).__module__ != np.__name__: theta = np.array(theta)
+    return 1 if sigmoidal(hipothesis(np.append([1],X),theta))>0.5 else 0
     
-    return sigmoidal( hipothesis( np.append([1],X) ,theta) ) 
-
 def normalizarMedia(vector): #Vector con valores de X
     media = vector.mean()
     #rango = vector.max() - vector.min()             
