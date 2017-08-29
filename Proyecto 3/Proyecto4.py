@@ -23,17 +23,26 @@ def hipothesis(vX,thetas):
 def sigmoidal(z):
     return 1/(1 + np.e**(-z))
 
-#Los 3 parametros son vectores
+#X y Y son vectores de misma size
+#Thetas tiene size == cols de X
 #Al finalizar el gradiente con datos prueba debemos obtener un 0.203
 def funcionCosto(thetas, X, Y):
-    J, grad = 0, "El gradiente"
-    m = len(X)
+    if type(thetas).__module__ != np.__name__: thetas = np.array(thetas)
+    if type(X).__module__ != np.__name__: X = np.array(X)
+    if type(Y).__module__ != np.__name__: Y = np.array(Y)
+
+    J, grad = 0, thetas.copy()
+    m = len(X) 
     for i in range(0,m):
         sigEval = sigmoidal(hipothesis(X[i],thetas))
         pt = -1*Y[i] *np.log(sigEval)
         pf = (1-Y[i])*np.log(1-sigEval)
-        J += pt - pf
-    J /= len(m)                    #Multiplicar todo por 1/m
+        J += pt - pf                
+    J /= m                              #Multiplicar todo por 1/m, J ya esta
+    #Calcular Gradiente del costo de thetas
+    for j in range(0, len(thetas) ):
+        grad[j] = sum( (sigmoidal(hipothesis(_x,thetas))-_y)*_x[j] for _x,_y in zip(X,Y) ) /m
+
     return (J, grad)
 
 #Regresa un vector de thetas calculado usando gradiente desc
