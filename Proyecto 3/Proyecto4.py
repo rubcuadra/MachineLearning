@@ -30,7 +30,9 @@ def funcionCosto(thetas, X, Y):
     if type(thetas).__module__ != np.__name__: thetas = np.array(thetas)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
-
+    #Si size thetas > Xs se deberia agregar 1s a X
+    if len(thetas) > len(X[0]): X = np.append(np.ones((X.shape[0],1)), X , axis=1) 
+    #Inicializar outputs
     J, grad = 0, thetas.copy()
     m = len(X) 
     for i in range(0,m):
@@ -39,6 +41,7 @@ def funcionCosto(thetas, X, Y):
         pf = (1-Y[i])*np.log(1-sigEval)
         J += pt - pf                
     J /= m                              #Multiplicar todo por 1/m, J ya esta
+    
     #Calcular Gradiente del costo de thetas
     for j in range(0, len(thetas) ):
         grad[j] = sum( (sigmoidal(hipothesis(_x,thetas))-_y)*_x[j] for _x,_y in zip(X,Y) ) /m
@@ -46,27 +49,20 @@ def funcionCosto(thetas, X, Y):
     return (J, grad)
 
 #Regresa un vector de thetas calculado usando gradiente desc
-def aprende(theta,X,y,iteraciones=1500):
-    #ES igual que gradiente desc pero agregando la derivada
-    return theta
-
-def gradienteDescendenteMultivariable(X,Y,theta=None,alpha=0.01,iteraciones=1500):
+def aprende(theta,X,Y,iteraciones=1500):
     '''Validar que todo sea Numpy array/matrix'''
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
     if theta is None: theta = np.zeros(X.shape[1]+1)  #Si no nos dieron theta llenarla con numero de Xs+1
     elif type(theta).__module__ != np.__name__: theta = np.array(theta)
 
-    #Comenzar a trabajar
-    jHistoria = np.zeros(iteraciones)                       #Historial de iteraciones
-    fixedX = np.append(np.ones((X.shape[0],1)), X , axis=1) #Agregar ones a X
-    
+    #Agregar ones a X
+    fixedX = np.append(np.ones((X.shape[0],1)), X , axis=1) 
+    m = len(X)
     for it in range(0,iteraciones): 
         tempThetas = theta.copy() #Thetas temporales
         for j in range(0, len(tempThetas) ):
-            #FORMULA thetaI = thetaI-(alfa/m)*sum( (hip(xi)-yi)*x[j]i  )
-            tempThetas[j] = theta[j] - (alpha/len(X))*sum( ( hipothesis(_x,theta)-_y)*_x[j] for (_x,_y) in zip(fixedX,Y) )
+            #FORMULA thetaI = thetaI-(1/m)*sum( (sigmoidal(hip(xi))-yi)*x[j]i  )
+            tempThetas[j] = theta[j] - (1/m)*sum( ( sigmoidal(hipothesis(_x,theta)) -_y )*_x[j] for (_x,_y) in zip(fixedX,Y) )
         theta = tempThetas
-        jHistoria[it]  = calculaCosto(fixedX,Y,theta)   #Guardar costos
-    return (jHistoria,theta)
-
+    return theta
