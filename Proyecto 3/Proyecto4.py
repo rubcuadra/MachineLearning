@@ -79,8 +79,7 @@ def predice(theta,X):
     p = np.zeros(len(X)) #Crear un vector de zeros para la respuesta
     f = lambda xi: sigmoidal( hipothesis(  xi,theta) ) #Esta es la prediccion, el resultado de la sigmoidal
     for i in range(0,len(X)): 
-        p[i] = f(X[i])    
-    
+        p[i] = 1 if f(X[i]) >= 0.5 else 0
     return p
 
 def normalizarMedia(vector): #Vector con valores de X

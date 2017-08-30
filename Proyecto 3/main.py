@@ -8,7 +8,6 @@ if __name__ == "__main__":
     
     costo, gradientesThetas = funcionCosto(thts,nX,yData)
     
-    print predice(thts,xData)
+    print predice(thts,nX)
 
     #graficaDatos(xData,yData,thts)
-    
