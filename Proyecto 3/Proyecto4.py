@@ -101,9 +101,9 @@ def normalizacionDeCaracteristicas(X): #VALIDAR SI mu y sigma SON DEL _X o X
     return (_X,mu,sigma)
 
 #Falta graficar la sigmoidal
+#Nos deberian dar una theta normalizada y una X normalizada, Y debe ser 1 o 0
 def graficaDatos(X,Y,theta):
     for _x,_y in zip(X,Y): plt.scatter( _x[0],_x[1], marker="x" if _y else 'o' ) #Puntos X/Y
-
     #Nos dieron datos crudos pero nuestras thetas estan normalizadas
     #nX = normalizacionDeCaracteristicas(X)[0]
     x1_min = np.amin(X,axis=0)[0]
@@ -116,5 +116,4 @@ def graficaDatos(X,Y,theta):
     plt.plot( xs  , [f(xi,theta) for xi in xs] )
     #plt.legend() # Add a legend
     plt.show()   # Show the plot
-
-
+    
