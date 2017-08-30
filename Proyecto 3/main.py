@@ -6,5 +6,9 @@ if __name__ == "__main__":
     nX = normalizacionDeCaracteristicas(xData)[0]
     thts = aprende(None,nX,yData)
     
-    print funcionCosto(thts,nX,yData)
-    #print predice(thts,xData[3])
+    costo, gradientesThetas = funcionCosto(thts,nX,yData)
+    
+    print predice(thts,xData)
+
+    #graficaDatos(xData,yData,thts)
+    

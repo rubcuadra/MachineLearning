@@ -25,6 +25,7 @@ def sigmoidal(z):
 
 #X y Y son vectores de misma size
 #Thetas tiene size == cols de X
+#Regresa el valor del costo y un arreglo de gradientes por cada theta
 #Al finalizar el gradiente con datos prueba debemos obtener un 0.203
 def funcionCosto(thetas, X, Y):
     if type(thetas).__module__ != np.__name__: thetas = np.array(thetas)
@@ -71,8 +72,17 @@ def aprende(theta,X,Y,iteraciones=1500):
 def predice(theta,X):
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(theta).__module__ != np.__name__: theta = np.array(theta)
-    return 1 if sigmoidal(hipothesis(np.append([1],X),theta))>0.5 else 0
     
+    #Si size thetas > Xs se deberia agregar 1s a X
+    if len(theta) > len(X[0]): X = np.append(np.ones((X.shape[0],1)), X , axis=1) 
+    
+    p = np.zeros(len(X)) #Crear un vector de zeros para la respuesta
+    f = lambda xi: sigmoidal( hipothesis(  xi,theta) ) #Esta es la prediccion, el resultado de la sigmoidal
+    for i in range(0,len(X)): 
+        p[i] = f(X[i])    
+    
+    return p
+
 def normalizarMedia(vector): #Vector con valores de X
     media = vector.mean()
     #rango = vector.max() - vector.min()             
@@ -90,3 +100,13 @@ def normalizacionDeCaracteristicas(X): #VALIDAR SI mu y sigma SON DEL _X o X
     mu = np.mean(X,axis=0)                            #Vector con medias
     sigma = np.std(X,axis=0)                          #Deviaciones estandares
     return (_X,mu,sigma)
+
+#Falta graficar la sigmoidal
+def graficaDatos(X,Y,theta):
+    for _x,_y in zip(X,Y):
+        plt.scatter( _x[0],_x[1], marker="x" if _y else 'o' ) #Puntos X/Y
+    #plt.plot(x, [ h_t(i, _thetas) for i in x], label='Regresion')
+    #plt.legend() # Add a legend
+    plt.show()   # Show the plot
+
+
