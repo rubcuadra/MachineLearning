@@ -6,7 +6,10 @@ if __name__ == "__main__":
     nX = normalizacionDeCaracteristicas(xData)[0]
     thts = aprende(None,nX,yData)
     
-    #costo, gradientesThetas = funcionCosto(thts,nX,yData)
-    #print predice(thts,nX)
-
-    graficaDatos(xData,yData,thts)
+    costo, gradientesThetas = funcionCosto(thts,nX,yData)
+    
+    # print costo
+    # #ERROR PROMEDIO = COSTO - Y SUMADO ENTRE M
+    # print predice(thts,nX)
+    # print thts
+    graficaDatos(nX,yData,thts)

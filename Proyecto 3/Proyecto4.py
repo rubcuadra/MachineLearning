@@ -102,12 +102,18 @@ def normalizacionDeCaracteristicas(X): #VALIDAR SI mu y sigma SON DEL _X o X
 
 #Falta graficar la sigmoidal
 def graficaDatos(X,Y,theta):
-    #for _x,_y in zip(X,Y): plt.scatter( _x[0],_x[1], marker="x" if _y else 'o' ) #Puntos X/Y
-    
-    #Si size thetas > Xs se deberia agregar 1s a X
-    if len(theta) > len(X[0]): X = np.append(np.ones((X.shape[0],1)), X , axis=1) 
-    #Llegar hasta donde da 0.5
+    for _x,_y in zip(X,Y): plt.scatter( _x[0],_x[1], marker="x" if _y else 'o' ) #Puntos X/Y
 
+    #Nos dieron datos crudos pero nuestras thetas estan normalizadas
+    #nX = normalizacionDeCaracteristicas(X)[0]
+    x1_min = np.amin(X,axis=0)[0]
+    x1_max = np.amax(X,axis=0)[0]
+    #Dos valores es suficiente puesto que es un recta
+    xs = [x1_min, x1_max]
+    #0.5 es la brecha de cuando pasa o no pasa el examen
+    f = lambda x1,th : (0.5-th[0]-th[1]*x1)/th[2]
+    #Evaluar x2 por cada x1
+    plt.plot( xs  , [f(xi,theta) for xi in xs] )
     #plt.legend() # Add a legend
     plt.show()   # Show the plot
 
