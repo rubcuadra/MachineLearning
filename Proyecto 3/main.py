@@ -7,7 +7,7 @@ if __name__ == "__main__":
     thts = aprende(None,nX,yData)
     
     costo, gradientesThetas = funcionCosto(thts,nX,yData)
-    
+    print (thts)
     print (costo)
     print (predice(thts,nX))
     print (thts)
