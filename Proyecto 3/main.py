@@ -8,7 +8,6 @@ if __name__ == "__main__":
     
     costo, gradientesThetas = funcionCosto(thts,nX,yData)
     
-    # ERROR PROMEDIO = COSTO - Y SUMADO ENTRE M
     print (costo)
     print (predice(thts,nX))
     print (thts)
