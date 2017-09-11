@@ -16,13 +16,10 @@ def setColsTo(newNumRows, npMatrix):
 	#Sacar las primeras newNumRows y dejarlas
 	return npMatrix[:,:newNumRows]
 
-gradoDeseado = 4
+gradoDeseado = 8
 xData,yData = getDataFromFile("datos.csv")
 xN,xMu,xSigma = normalizacionDeCaracteristicas(xData)
 yN,yMu,ySigma = normalizacionDeCaracteristicas(yData)
 newXMatrix = setColsTo( gradoDeseado, xN )
-thetas = gradienteDescendenteMultivariable(newXMatrix,yN)
+thetas = gradienteDescendenteMultivariable(newXMatrix,yN,alpha=0.00001,iteraciones=100000)
 graficar(xN,yN,thetas, newXMatrix)
-
-
-
