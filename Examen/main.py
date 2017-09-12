@@ -1,15 +1,8 @@
 from Examen import *
 
 if __name__ == "__main__":
-    #Leer archivos
-    # xData, yData = getDataFromFile('data.csv')
-    # nX = normalizacionDeCaracteristicas(xData)[0]
-    # thts = aprende(None,nX,yData)
+    xData, yData = getDataFromFile('datos.csv')
+    errors, thetas = gradienteDescendenteMultivariable(xData,yData,alpha=0.01,iteraciones=100)
     
-    # costo, gradientesThetas = funcionCosto(thts,nX,yData)
-    # print (thts)
-    # print (costo)
-    # print (predice(thts,nX))
-    # print (thts)
-    # graficaDatos(nX,yData,thts)
-    pass
+    graficaError(errors)
+    graficarDatos(xData,yData,thetas)
