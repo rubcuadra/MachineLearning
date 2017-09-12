@@ -80,10 +80,22 @@ def gradienteDescendenteMultivariable(X,Y,theta=None,alpha=0.01,iteraciones=1500
             #FORMULA thetaI = thetaI-(alfa/m)*sum( (hip(xi)-yi)*x[j]i  )
             tempThetas[j] = theta[j] - (alpha/len(X))*sum( ( hipothesis(_x,theta)-_y)*_x[j] for (_x,_y) in zip(fixedX,Y) )
         theta = tempThetas
+        
         jHistoria[it]  = calculaCosto(fixedX,Y,theta)   #Guardar costos
+        if it!=0:
+            if jHistoria[it-1] < jHistoria[it]: #Si vamos reduciendo costo
+                alpha = alpha/2 #Reducir alpha, nos estamos acercando 
     return (jHistoria,theta)
 
 def predicePrecio(X,theta):
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(theta).__module__ != np.__name__: theta = np.array(theta)
     return hipothesis( np.append([1],X) ,theta)
+
+# from Examen import *
+
+if __name__ == "__main__":
+    xData, yData = getDataFromFile('datos.csv')
+    errors, thetas = gradienteDescendenteMultivariable(xData,yData,alpha=0.09,iteraciones=100)
+    graficaError(errors)
+    graficarDatos(xData,yData,thetas)
