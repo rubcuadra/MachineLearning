@@ -29,21 +29,47 @@ class Board():
         brd.val[:,col_i][ix[-1]] = disk
         return brd                #Regresar tablero modificado
 
-    def getBoardScore(boardToTest, ourDisk):
-        if not boardToTest:        #No hay board
+    def getSize(self):
+        return self.val.shape
+
+    #Regresa la celda o None
+    def g(self,row,column): 
+        try:    return self[row][column]
+        except: return None
+
+    def getBoardScore(_board, ourDisk, movedColumn):
+        if not _board:        #No hay board
             return -1*maxsize      #Regresar - demasiados puntos
-        print(boardToTest) 
-        #Heuristic
-        #print (boardToTest)
-        #print (boardToTest[-1][1]) #Fila de hasta abajo, columna 1
+        
+        rows,columns = _board.getSize() #Saber si ya nos pasamos de rows o columns
+        #movedColumn = movedColumn      #Es el que nos pasaron
+        movedRow     = _board.val[:,movedColumn].nonzero()[0][0]
+
+        #Celdas para validar, pueden ser None
+        current = _board[movedRow][movedColumn]
+        der = _board.g(movedRow,movedColumn+1)
+        izq = _board.g(movedRow,movedColumn-1)
+        up = _board.g(movedRow-1,movedColumn)
+        dwn = _board.g(movedRow+1,movedColumn)
+        #Diagonales directas - grado 1, solo se cambia el grado
+        upDer  = _board.g(movedRow-1,movedColumn+1)
+        dwnDer = _board.g(movedRow+1,movedColumn+1)
+        upIzq  = _board.g(movedRow-1,movedColumn-1)
+        dwnIzq = _board.g(movedRow+1,movedColumn-1) 
+        
         return randint(100,8000) #Un numero grande
 
+def getScores(boards,disk):
+    r = np.array([])
+    for i,b in enumerate(boards):
+        r = np.append(r, Board.getBoardScore(b,disk,i))
+    return r
+
 def getBestColToPlay(nativeBoard,disk,totalColumns=7):
-    ff = np.vectorize( Board.getBoardScore ) #Evaluar cada tablero y regresar su Score                               
     _board = Board(nativeBoard) #Crear un tablero nuestro
     population       = _board.getCombinations(disk)
     #Por cada tablero en population podemos obtener nuevas populations -> Bajar en el arbol
-    populationScores = ff( population,disk ) 
+    populationScores = getScores(population,disk)
     #Si quisieramos a modo de arbol seria loopear para sacar el bestSpecimen
     bestSpecimen     = np.argmax(populationScores)
     return bestSpecimen
