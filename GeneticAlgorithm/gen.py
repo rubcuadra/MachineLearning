@@ -1,5 +1,6 @@
 import numpy as np
 from random import random,randint
+
 #Encontrar el maximo en la ecuacion x^2 donde x solo puede ser mayor 
 def mainFunc(x):
 	return x^2
@@ -123,4 +124,4 @@ if __name__ == '__main__':
 	numIndividuos = 8
 
 	bestSpecimen = genetic(numIndividuos,specBits)
-	print decode(bestSpecimen["value"])
+	print( decode(bestSpecimen["value"]) )
