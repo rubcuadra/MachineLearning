@@ -91,7 +91,7 @@ def specimenToDict(specimen,gen):
 def genetic(popSize,specBits,probabCruce=1,probabMutacion=0.001,generaciones=10):
 	#Some funcs
 	ff = np.vectorize( fitnessFunc )         										 
-	sp = np.vectorize( lambda s,totalPoints: np.divide(s,totalPoints,dtype=float)  ) 
+	sp = np.vectorize( lambda s,totalPoints: np.divide(s,totalPoints if totalPoints!=0 else 1,dtype=float)  ) 
 	#initial Population
 	population   = np.array( [ encode( getRandomSpecimen(specBits),bits=specBits ) for i in range(popSize)] )
 	bestSpecimen = specimenToDict(population[0],0)
