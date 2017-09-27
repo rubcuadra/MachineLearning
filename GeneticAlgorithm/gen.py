@@ -124,4 +124,4 @@ if __name__ == '__main__':
 	numIndividuos = 8
 
 	bestSpecimen = genetic(numIndividuos,specBits)
-	print( decode(bestSpecimen["value"]) )
+	#print( decode(bestSpecimen["value"]) )
