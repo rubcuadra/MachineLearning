@@ -9,7 +9,7 @@ def mainFunc(x):
 #Regresa una marca dependiendo que tan bueno o malo pueda ser para la solucion
 def fitnessFunc(subject):
 	sValue = decode(subject) #Decodificar
-	return sValue**2 #Un numero grande
+	return 1+sValue**2 #Un numero grande
 
 #Vector de Numpy array
 #Con valores binarios -> Decimal
