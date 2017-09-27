@@ -87,7 +87,7 @@ def specimenToDict(specimen,gen):
 #	Probabilidad de reproducirse
 #	Probabilidad de que un bit mute
 #	Numero de generaciones
-def genetic(popSize,specBits,probabCruce=1,probabMutacion=0.001,generaciones=5000):
+def genetic(popSize,specBits,probabCruce=1,probabMutacion=0.001,generaciones=10):
 	#Some funcs
 	ff = np.vectorize( fitnessFunc )         										 
 	sp = np.vectorize( lambda s,totalPoints: np.divide(s,totalPoints,dtype=float)  ) 
@@ -120,7 +120,7 @@ def genetic(popSize,specBits,probabCruce=1,probabMutacion=0.001,generaciones=500
 
 if __name__ == '__main__':
 	specBits = 5
-	numIndividuos = 4
+	numIndividuos = 8
 
 	bestSpecimen = genetic(numIndividuos,specBits)
 	print decode(bestSpecimen["value"])
