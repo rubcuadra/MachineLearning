@@ -27,8 +27,11 @@ def getRandomSpecimen(bits):
 	val = randint(0,31)
 	return val
 
-#Obtenemos una poblacion y sus probabilidades de sobrevivencia
-#devuelve 2 padres de esa poblacion
+#Recibe: 
+#	Una poblacion (Arreglo de especimenes) 
+#	Sus Probabilidades de sobrevivencia (Calculadas con fitnesFunct)
+#Devuelve: 
+#	Arreglo de 2 posiciones representando especimenes
 def getParents(p,spr):
 	parents = []
 	while len(parents) < 2:               #Solo hay 2 padres
@@ -42,6 +45,12 @@ def getParents(p,spr):
 				break
 	return parents
 
+#Recibe:
+#	Probabilidad de que se reproduzcan 2 especimenes
+#	Especimen 1
+#	Especimen 2
+#Devuelve
+#	Los hijos o Nada
 def reproduce(probabCruce,mom,dad):
 	if random() < probabCruce: #Se pueden reproducir
 		toCut = randint(1,min(len(mom),len(dad))-1) #Ni al inicio ni al final
@@ -61,11 +70,14 @@ def mutate(char,probability):
 #	Probabilidad de mutar
 #	Hijo 1
 #	Hijo 2
+#Devuelve 
+#	Arreglo de 2 posiciones representando especimenes(Hijos)
 def mutateSons(pm,son,daughter):
 	son = "".join( mutate(l,pm) for l in son)
 	daughter = "".join(mutate(l,pm) for l in daughter)
 	return [son,daughter]
 
+#Para guardar a lo largo de las generaciones
 def specimenToDict(specimen,gen):
 	return {"value":specimen,"score":fitnessFunc(specimen),"gen":gen}
 
