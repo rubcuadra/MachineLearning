@@ -70,10 +70,12 @@ class Board():
 
     def getBoardScore(_board, ourDisk, movedColumn):
         if not _board: return Board.minScore  #Regresar el minimo   
+        
         rows,columns = _board.getSize() #Saber si ya nos pasamos de rows o columns
         #movedColumn = movedColumn      #Es el que nos pasaron
         movedRow     = _board.val[:,movedColumn].nonzero()[0][0]
-        
+
+        accumPoints = 0
         #Celdas para validar, pueden ser None
         current = _board[movedRow][movedColumn]
         der = _board.g(movedRow,movedColumn+1)
@@ -84,9 +86,35 @@ class Board():
         upDer  = _board.g(movedRow-1,movedColumn+1)
         dwnDer = _board.g(movedRow+1,movedColumn+1)
         upIzq  = _board.g(movedRow-1,movedColumn-1)
-        dwnIzq = _board.g(movedRow+1,movedColumn-1) 
+        dwnIzq = _board.g(movedRow+1,movedColumn-1)
         
-        return randint(100,8000) #Un numero grande
+        #Checar si la primera fila no hay nada en las 3 columnas del centro
+        if any ( [movedColumn == 2 and movedRow == 5, movedColumn == 3 and movedRow == 5, movedColumn == 4 and movedRow == 5] ):
+            accumPoints += 500
+
+        #checar si dos puntos se llegan a pegar
+        if any ( [der == current, izq == current, up == current, upDer == current, dwnDer == current, upIzq == current, dwnIzq == current] ):
+            accumPoints += 1000
+
+        #checar si tres puntos se llegan a pegar
+        if any ( [der == current and izq == current, up == current and dwn == current, upDer == current and dwnIzq == current, upIzq == current and dwnDer == current]):
+            accumPoints += 1000
+        
+        #checar si se llega a formar una T
+        if any ( [der == current and izq == current and dwn == current,
+                    dwnIzq == current and dwnDer == current and dwn == current,
+                    upIzq == current and dwnIzq == current and izq == current,
+                    upDer == current and dwnDer == current and der == current,
+                    dwnIzq == current and upIzq == current and dwnDer == current,
+                    dwnIzq == current and upDer == current and dwnDer == current,
+                    upIzq == current and dwnDer == current and upDer == current,
+                    dwnIzq == current and upIzq == current and upDer == current
+                    ] ):
+            accumPoints += 5000
+
+        return accumPoints #Regresar Puntaje acumulado
+
+
 
 def getBestColToPlay(nativeBoard,disk,totalColumns=7,depth=3):
     _board = Board(nativeBoard) #Crear un tablero nuestro
