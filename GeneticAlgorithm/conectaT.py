@@ -4,22 +4,28 @@ from random import random,randint
 from sys import maxsize
 
 class BoardNode():
-    def __init__(self, data):
-        self.data = data
+    ourPlayer   = True
+    otherPlayer = False
+    nobody      = None
+
+    def __init__(self, data, player=nobody, thrown=None):
+        self.board = data
+        self.player = player
+        self.col = thrown
         self.children = []
 
-    def add_children_boards(self, boardsArray):
-        for board in boardsArray:
-            self.children.append( BoardNode(board) )
+    def add_children_boards(self, boardsArray, player):
+        for i,board in enumerate(boardsArray):
+            self.children.append( BoardNode(board,player,i) )
 
     def getMax(self): #Nos devuelve el hijo con mejor score y su index
         maxi = 0
         maxScore = Board.minScore
         for i,c in enumerate(self.children):     #Nodos Hijos
-            if c.data is None: continue
-            if maxScore<c.data.score:
+            if c.board is None: continue
+            if maxScore<c.board.score:
                 maxi = i
-                maxScore = c.data.score
+                maxScore = c.board.score
         return (maxi,maxScore)
 
 class Board():
@@ -70,7 +76,7 @@ class Board():
 
     def getBoardScore(_board, ourDisk, movedColumn):
         if not _board: return Board.minScore  #Regresar el minimo   
-        
+
         rows,columns = _board.getSize() #Saber si ya nos pasamos de rows o columns
         #movedColumn = movedColumn      #Es el que nos pasaron
         movedRow     = _board.val[:,movedColumn].nonzero()[0][0]
@@ -120,7 +126,7 @@ def getBestColToPlay(nativeBoard,disk,totalColumns=7,depth=3):
     _board = Board(nativeBoard) #Crear un tablero nuestro
     
     root = BoardNode( _board )
-    root.add_children_boards( _board.getCombinations(disk) )
+    root.add_children_boards(_board.getCombinations(disk),BoardNode.ourPlayer)
     # for i in range(depth-1):                        #depths hacia abajo
     #     d = disk if not i%2 else 666 #cualquier otro numero
     #     calculateScores(population,d)    
