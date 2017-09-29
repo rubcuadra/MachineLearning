@@ -1,3 +1,5 @@
+#Ruben Cuadra
+#Seung Hoon Lee
 import numpy as np
 from copy import copy
 from random import random,randint
