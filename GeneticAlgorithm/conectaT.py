@@ -36,6 +36,17 @@ class BoardNode():
                 maxi = i
         return (maxi,maxScore)
 
+    def addDepth(self, depth, ourDisk, enemyDisk):
+        if not depth: return
+        if depth%2: #1
+            player = BoardNode.ourPlayer 
+            disk   = ourDisk
+        else:
+            player = BoardNode.otherPlayer
+            disk   = enemyDisk
+        root.add_children_boards(root.board.getCombinations(disk),player)
+        for child in root.children: child.addDepth(depth-1,ourDisk,enemyDisk)
+
 class Board():
     minScore = -1*maxsize
     def __init__(self,nativeBoard=None):
@@ -128,15 +139,13 @@ class Board():
 
         return accumPoints #Regresar Puntaje acumulado
 
-
-
-def getBestColToPlay(nativeBoard,disk,totalColumns=7,depth=3):
+def getBestColToPlay(nativeBoard,disk,totalColumns=7,depth=1):
     _board = Board(nativeBoard) #Crear un tablero nuestro
-    
     root = BoardNode( _board )
-    root.add_children_boards(_board.getCombinations(disk),BoardNode.ourPlayer)
-    
-    #Agregar hijos aqui
-
+    #Nuestro disco y el enemigo, genera N profundidad
+    root.addDepth(depth, disk, disk+1) 
+    #Obtener indice del hijo con mayor peso
     colToThrow,colScore = root.getMax()
     return colToThrow
+
+
