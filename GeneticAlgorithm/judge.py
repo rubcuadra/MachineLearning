@@ -133,7 +133,7 @@ def checkWinTopRight(col, row, player_number):
     if(board[row-2][col] == player_number and board[row-1][col-1] == player_number and board[row][col-2] == player_number): return True
     return False
 
-def intelligentFunction1(turn, board): #We are number 1
+def intelligentFunction1(turn, board):
     play = getBestColToPlay( board , turn )
     return play
 
