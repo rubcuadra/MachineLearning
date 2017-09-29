@@ -71,7 +71,7 @@ class Board():
         self.val = None
         self.score = self.minScore
         if nativeBoard:
-            self.val = np.array(nativeBoard).transpose()[::-1,:] #Fix para que salga como deberia
+            self.val = np.flip(np.array(nativeBoard),axis=0)#Fix para que salga como deberia
 
     def __getitem__(self,i):
          return self.val[i]
@@ -113,12 +113,12 @@ class Board():
 
     def getBoardScore(_board, ourDisk, movedColumn):
         if not _board: return Board.minScore  #Regresar el minimo   
-
+        
         rows,columns = _board.getSize() #Saber si ya nos pasamos de rows o columns
         #movedColumn = movedColumn      #Es el que nos pasaron
         movedRow     = _board.val[:,movedColumn].nonzero()[0][0]
 
-        accumPoints = 0
+        accumPoints = 100
         #Celdas para validar, pueden ser None
         current = _board[movedRow][movedColumn]
         der = _board.g(movedRow,movedColumn+1)
@@ -154,7 +154,9 @@ class Board():
                     dwnIzq == current and upIzq == current and upDer == current
                     ] ):
             accumPoints += 50000
-
+        
+        #Numero de movimientos
+        accumPoints -= np.count_nonzero(_board.val)/2
         return accumPoints #Regresar Puntaje acumulado
 
 def getBestColToPlay(nativeBoard,disk,totalColumns=7,depth=5):

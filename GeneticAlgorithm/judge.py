@@ -160,8 +160,8 @@ def intelligentFunction2(turn, board):
             move = int(input('Enter your move!'))
             if move < 0 or move >= width: raise Exception("No valido")
             return move 
-        except:
-            print ("Solo se aceptan numeros de 0 - 6")
+        except KeyboardInterrupt: raise
+        except:print ("Solo se aceptan numeros de 0 - 6")
 
 def main():
     global board
