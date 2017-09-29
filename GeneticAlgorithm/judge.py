@@ -152,7 +152,7 @@ def checkWinTopRight(row, col, player_number):
 
 
 def intelligentFunction1(turn, board):
-    return getBestColToPlay(board,turn,depth=5)
+    return getBestColToPlay(board,turn,depth=1)
 
 def intelligentFunction2(turn, board):
     while True:
