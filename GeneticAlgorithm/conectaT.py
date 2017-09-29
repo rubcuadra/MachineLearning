@@ -107,7 +107,8 @@ class Board():
         return self.val.shape
 
     #Regresa la celda o None
-    def g(self,row,column): 
+    def g(self,row,column):
+        if row<0 or column<0:return None
         try:    return self[row][column]
         except: return None
 
@@ -130,7 +131,7 @@ class Board():
         dwnDer = _board.g(movedRow+1,movedColumn+1)
         upIzq  = _board.g(movedRow-1,movedColumn-1)
         dwnIzq = _board.g(movedRow+1,movedColumn-1)
-        
+
         #Checar si la primera fila no hay nada en las 3 columnas del centro
         if any ( [movedColumn == 2 and movedRow == 5, movedColumn == 3 and movedRow == 5, movedColumn == 4 and movedRow == 5] ):
             accumPoints += 500
