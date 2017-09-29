@@ -156,7 +156,35 @@ class Board():
                     upIzq == current and dwnDer == current and upDer == current,
                     dwnIzq == current and upIzq == current and upDer == current
                     ] ):
-            accumPoints += 50000
+            accumPoints += 8000
+
+        #Enemy disk
+        enemyDisk = 1 if ourDisk is 2 else 2 #Bien naco, np buscar diferentes a 0 y ourdisk
+        
+        #checar si se llega a formar una T
+        if any ( [der == enemyDisk and izq == enemyDisk and dwn == enemyDisk,
+                    dwnIzq == enemyDisk and dwnDer == enemyDisk and dwn == enemyDisk,
+                    upIzq == enemyDisk and dwnIzq == enemyDisk and izq == enemyDisk,
+                    upDer == enemyDisk and dwnDer == enemyDisk and der == enemyDisk,
+                    dwnIzq == enemyDisk and upIzq == enemyDisk and dwnDer == enemyDisk,
+                    dwnIzq == enemyDisk and upDer == enemyDisk and dwnDer == enemyDisk,
+                    upIzq == enemyDisk and dwnDer == enemyDisk and upDer == enemyDisk,
+                    dwnIzq == enemyDisk and upIzq == enemyDisk and upDer == enemyDisk,
+                    der == enemyDisk and der_der == enemyDisk and dwnDer == enemyDisk,
+                    izq == enemyDisk and izq_izq == enemyDisk and dwnIzq == enemyDisk,
+                    der == enemyDisk and upDer == enemyDisk and der_der == enemyDisk,
+                    izq == enemyDisk and izq_izq == enemyDisk and upIzq == enemyDisk,
+                    dwn == enemyDisk and dwn_dwn == enemyDisk and dwnDer == enemyDisk,
+                    dwn == enemyDisk and dwn_dwn == enemyDisk and dwnIzq == enemyDisk,
+                    dwnDer == enemyDisk and dwnDer_dwnDer == enemyDisk and dwn_dwn == enemyDisk,
+                    upIzq == enemyDisk and upIzq_upIzq == enemyDisk and izq_izq == enemyDisk,
+                    dwnIzq == enemyDisk and dwnIzq_dwnIzq == enemyDisk and dwn_dwn == enemyDisk,
+                    upDer == enemyDisk and upDer_upDer == enemyDisk and der_der == enemyDisk,
+                    dwnDer == enemyDisk and dwnDer_dwnDer == enemyDisk and der_der == enemyDisk,
+                    izq_izq == enemyDisk and dwnIzq == enemyDisk and dwn_dwn == enemyDisk,
+                    dwnIzq == enemyDisk and dwnIzq_dwnIzq == enemyDisk and izq_izq == enemyDisk,
+                    der_der == enemyDisk and dwnDer == enemyDisk and dwn_dwn == enemyDisk] ):
+            accumPoints += 4000
         
         #Numero de movimientos
         accumPoints -= np.count_nonzero(_board.val)/2
