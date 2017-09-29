@@ -133,6 +133,15 @@ class Board():
         dwnDer = _board.g(movedRow+1,movedColumn+1)
         upIzq  = _board.g(movedRow-1,movedColumn-1)
         dwnIzq = _board.g(movedRow+1,movedColumn-1)
+        #celdas con grado 2
+        der_der = _board.g(movedRow, movedColumn+2)
+        izq_izq = _board.g(movedRow, movedColumn-2)
+        up_up = _board.g(movedRow-2, movedColumn)
+        dwn_dwn = _board.g(movedRow+2, movedColumn)
+        upDer_upDer = _board.g(movedRow-2, movedColumn+2)
+        dwnDer_dwnDer = _board.g(movedRow+2, movedColumn+2)
+        upIzq_upIzq = _board.g(movedRow-2, movedColumn-2)
+        dwnIzq_dwnIzq = _board.g(movedRow+2, movedColumn-2)
 
         #Checar si la primera fila no hay nada en las 3 columnas del centro
         if any ( [movedColumn == 2 and movedRow == 5, movedColumn == 3 and movedRow == 5, movedColumn == 4 and movedRow == 5] ):
@@ -160,7 +169,7 @@ class Board():
 
         #Enemy disk
         enemyDisk = 1 if ourDisk is 2 else 2 #Bien naco, np buscar diferentes a 0 y ourdisk
-        
+
         #checar si se llega a formar una T
         if any ( [der == enemyDisk and izq == enemyDisk and dwn == enemyDisk,
                     dwnIzq == enemyDisk and dwnDer == enemyDisk and dwn == enemyDisk,
@@ -198,7 +207,7 @@ def getBestColToPlay(nativeBoard,disk,totalColumns=7,depth=5):
     #Obtener indice del hijo con mayor peso
     colToThrow,colScore = root.getMax()
     # print(root)                #Imprime su board y sus hijos
-    # print(colToThrow,colScore) #Imprime col designada y el puntaje ahi
+    print(colToThrow,colScore) #Imprime col designada y el puntaje ahi
     return colToThrow
 
 
