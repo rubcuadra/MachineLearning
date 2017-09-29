@@ -20,7 +20,7 @@ class BoardNode():
             self.children.append( BoardNode(board,player,i) )
 
     def tempMax(self):        #Nos da el mas grande 
-        if not self:          #Tablero None
+        if not self.board:          #Tablero None
             return 0          #Neutro aditivo
         if not self.children: #Ya se acabo, solo regresar su valor
             return self.board.score*self.player
@@ -39,7 +39,8 @@ class BoardNode():
         return (maxi,maxScore)
 
     def addDepth(self, depth, ourDisk, enemyDisk):
-        if not depth: return
+        if not depth or not self.board: return
+        
         if depth%2: #1
             player = BoardNode.ourPlayer 
             disk   = ourDisk
