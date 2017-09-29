@@ -50,9 +50,12 @@ class BoardNode():
                 maxi = i
         return (maxi,maxScore)
 
+    #Empieza a agregar hijos al nodo, us es para saber si usa
+    #el ourDisk o el enemyDisk, esto afecta los prints y 
+    #para calcular puntajes, nos da + a nosotros y - cuando es del enemigo
     def addDepth(self, depth, ourDisk, enemyDisk, us):
         if not depth or not self.board: return
-        if us: #1
+        if us:
             player = BoardNode.ourPlayer 
             disk   = ourDisk
         else:
