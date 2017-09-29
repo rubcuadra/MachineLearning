@@ -153,7 +153,7 @@ class Board():
                     upIzq == current and dwnDer == current and upDer == current,
                     dwnIzq == current and upIzq == current and upDer == current
                     ] ):
-            accumPoints += 5000
+            accumPoints += 50000
 
         return accumPoints #Regresar Puntaje acumulado
 
