@@ -4,9 +4,10 @@ from random import random,randint
 from sys import maxsize
 
 class BoardNode():
-    ourPlayer   = True
-    otherPlayer = False
-    nobody      = None
+    #Multiplicadores de scores
+    ourPlayer   = 1
+    otherPlayer = -1
+    nobody      = 0
 
     def __init__(self, data, player=nobody, thrown=None):
         self.board = data
@@ -18,14 +19,21 @@ class BoardNode():
         for i,board in enumerate(boardsArray):
             self.children.append( BoardNode(board,player,i) )
 
+    def tempMax(self):        #Nos da el mas grande 
+        if not self.children: #Ya se acabo, solo regresar su valor
+            return self.board.score*self.player
+        else:
+            return max( c.tempMax()+self.board.score*self.player for c in self.children )
+
     def getMax(self): #Nos devuelve el hijo con mejor score y su index
         maxi = 0
         maxScore = Board.minScore
         for i,c in enumerate(self.children):     #Nodos Hijos
             if c.board is None: continue
-            if maxScore<c.board.score:
+            currentMax = c.tempMax()             #Obtener el mayor puntaje posible de este node
+            if currentMax > maxScore:
+                maxScore = currentMax
                 maxi = i
-                maxScore = c.board.score
         return (maxi,maxScore)
 
 class Board():
@@ -127,8 +135,8 @@ def getBestColToPlay(nativeBoard,disk,totalColumns=7,depth=3):
     
     root = BoardNode( _board )
     root.add_children_boards(_board.getCombinations(disk),BoardNode.ourPlayer)
-    # for i in range(depth-1):                        #depths hacia abajo
-    #     d = disk if not i%2 else 666 #cualquier otro numero
-    #     calculateScores(population,d)    
+    
+    #Agregar hijos aqui
+
     colToThrow,colScore = root.getMax()
     return colToThrow

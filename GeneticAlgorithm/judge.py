@@ -133,9 +133,8 @@ def checkWinTopRight(col, row, player_number):
     if(board[row-2][col] == player_number and board[row-1][col-1] == player_number and board[row][col-2] == player_number): return True
     return False
 
-def intelligentFunction1(turn, board):
+def intelligentFunction1(turn, board): #We are number 1
     play = getBestColToPlay( board , turn )
-
     return play
 
 def intelligentFunction2(turn, board):
@@ -159,11 +158,11 @@ def main():
             break;
 
     #Game is a tie
-    # if(gameFinished(turn) == -1): print ("The game is a tie!")
-    # elif not(loser == 0): print ("The loser is ", turn)
-    # else:
-    #     printGame()
-    #     print ("The winner is ", turn)
+    if(gameFinished(turn) == -1): print ("The game is a tie!")
+    elif not(loser == 0): print ("The loser is ", turn)
+    else:
+        #printGame()
+        print ("The winner is ", turn)
 
 if __name__ == '__main__':
    main()
