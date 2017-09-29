@@ -20,6 +20,8 @@ class BoardNode():
             self.children.append( BoardNode(board,player,i) )
 
     def tempMax(self):        #Nos da el mas grande 
+        if not self:          #Tablero None
+            return 0          #Neutro aditivo
         if not self.children: #Ya se acabo, solo regresar su valor
             return self.board.score*self.player
         else:
@@ -44,8 +46,10 @@ class BoardNode():
         else:
             player = BoardNode.otherPlayer
             disk   = enemyDisk
-        root.add_children_boards(root.board.getCombinations(disk),player)
-        for child in root.children: child.addDepth(depth-1,ourDisk,enemyDisk)
+        self.add_children_boards(self.board.getCombinations(disk),player)
+        
+        for child in self.children: 
+            child.addDepth(depth-1,ourDisk,enemyDisk)
 
 class Board():
     minScore = -1*maxsize
@@ -139,7 +143,7 @@ class Board():
 
         return accumPoints #Regresar Puntaje acumulado
 
-def getBestColToPlay(nativeBoard,disk,totalColumns=7,depth=1):
+def getBestColToPlay(nativeBoard,disk,totalColumns=7,depth=3):
     _board = Board(nativeBoard) #Crear un tablero nuestro
     root = BoardNode( _board )
     #Nuestro disco y el enemigo, genera N profundidad
