@@ -19,20 +19,23 @@ class BoardNode():
         for i,board in enumerate(boardsArray):
             self.children.append( BoardNode(board,player,i) )
 
-    def tempMax(self):        #Nos da el mas grande 
+    #Devuelve el puntaje maximo de este Nodo sumandole/restandole sus hijos
+    def getMaxScore(self):        #Nos da el mas grande 
         if not self.board:          #Tablero None
             return 0          #Neutro aditivo
         if not self.children: #Ya se acabo, solo regresar su valor
             return self.board.score*self.player
         else:
-            return max( c.tempMax()+self.board.score*self.player for c in self.children )
+            return max( c.getMaxScore()+self.board.score*self.player for c in self.children )
 
-    def getMax(self): #Nos devuelve el hijo con mejor score y su index
+    #Nos devuelve el indice del hijo con mejor score
+    #y su Score
+    def getMax(self): 
         maxi = 0
         maxScore = Board.minScore
         for i,c in enumerate(self.children):     #Nodos Hijos
             if c.board is None: continue
-            currentMax = c.tempMax()             #Obtener el mayor puntaje posible de este node
+            currentMax = c.getMaxScore()             #Obtener el mayor puntaje posible de este node
             if currentMax > maxScore:
                 maxScore = currentMax
                 maxi = i
@@ -40,7 +43,6 @@ class BoardNode():
 
     def addDepth(self, depth, ourDisk, enemyDisk):
         if not depth or not self.board: return
-        
         if depth%2: #1
             player = BoardNode.ourPlayer 
             disk   = ourDisk
@@ -48,7 +50,6 @@ class BoardNode():
             player = BoardNode.otherPlayer
             disk   = enemyDisk
         self.add_children_boards(self.board.getCombinations(disk),player)
-        
         for child in self.children: 
             child.addDepth(depth-1,ourDisk,enemyDisk)
 
