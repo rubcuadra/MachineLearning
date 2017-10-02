@@ -26,6 +26,21 @@ def netF( vX, vW):
 def entrenaPerceptron(X,Y,weights=None,e=0.01,maxIters=1000,alpha=1):
     return entrenaPerceptron2(**locals())[0] #Solo regresar los pesos que piden
 
+def entrenaAdaline(X,Y,weights=None,maxIters=1000,alpha=1):
+    if weights is None: weights = np.array( [random() for i in range(X.shape[1]+1)] ) #Si no nos dieron pesos vacios usar un random
+    elif type(weights).__module__ != np.__name__: weights = np.array(weights)
+    X = np.append(np.ones((X.shape[0],1)), X , axis=1) #Appendear 1s izq
+
+    errors = [] #Para graficar, aun no la regresamos
+    
+    for i in range(len(X)): #iterar sobre cada ejemplo
+        sk = netF(X[i],weights)
+        dk = Y[i]
+        ek = dk-sk
+        #Actualizar pesos
+        #Si los errores cuadraticos medios
+            
+
 def entrenaPerceptron2(X,Y,weights=None,e=0.01,maxIters=1000,alpha=1):
     if weights is None: weights = np.array( [random() for i in range(X.shape[1]+1)] ) #Si no nos dieron pesos vacios usar un random
     elif type(weights).__module__ != np.__name__: weights = np.array(weights)
@@ -66,9 +81,11 @@ def graficaErrores(errores):
 if __name__ == '__main__':
     fileToUse = "dataAND.csv"
     xData,yData = getDataFromFile(fileToUse)
-    pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
-    print fileToUse
-    print "w :",pesosPerc
-    for x,y in zip(xData,yData): #Validar que es correcta la prediccion
-        print x,":",predicePerceptron(pesosPerc,x)    
-    graficaErrores(erroresPerc)
+    # pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
+    # print fileToUse
+    # print "w :",pesosPerc
+    # for x,y in zip(xData,yData): #Validar que es correcta la prediccion
+    #     print x,":",predicePerceptron(pesosPerc,x)    
+    # graficaErrores(erroresPerc)
+    res = entrenaAdaline(xData,yData)
+
