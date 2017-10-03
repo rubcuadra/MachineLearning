@@ -15,10 +15,13 @@ def getDataFromFile(filename):
             val[1].append( float( i[-1] )  )
     return [np.array(val[0]),np.array(val[1])]
 
-#Funcion escalon usada para calcular una salida
-def netF( vX, vW): 
-    r = vW.transpose().dot(vX)
-    return 1 if r > 0 else 0 #True or False
+#Funcion net, hipothesis
+def net(vX,vW):
+    return vW.transpose().dot(vX)
+
+#Funcion escalon de net
+def netE( vX, vW): 
+    return 1 if net(vX,vW) > 0 else 0 #True or False
 
 #Alpha es el factor ganancia
 #Max iters es para que no se quede trabado
@@ -34,12 +37,13 @@ def entrenaAdaline(X,Y,weights=None,maxIters=1000,alpha=1):
     errors = [] #Para graficar, aun no la regresamos
     
     for i in range(len(X)): #iterar sobre cada ejemplo
-        sk = netF(X[i],weights)
-        dk = Y[i]
-        ek = dk-sk
+        ek = Y[i] - net(X[i],weights)
         #Actualizar pesos
         #Si los errores cuadraticos medios
-            
+    
+    #NO SE USA EL ESCALON
+    #SACAR EL ERROR, No siempre es 0 o 1
+    #Ajustar con el redondeo
 
 def entrenaPerceptron2(X,Y,weights=None,e=0.01,maxIters=1000,alpha=1):
     if weights is None: weights = np.array( [random() for i in range(X.shape[1]+1)] ) #Si no nos dieron pesos vacios usar un random
@@ -51,7 +55,7 @@ def entrenaPerceptron2(X,Y,weights=None,e=0.01,maxIters=1000,alpha=1):
     while not validError:
         validError = True
         for i in range(len(X)): #iterar sobre cada ejemplo
-            net = netF(X[i],weights)
+            net = netE(X[i],weights)
             cError = Y[i]-net   #Obtener error actual con valorReal-net
             for j in range(len(weights)):
                 weights[j] += alpha*cError*X[i][j] #ultimo error*Xs en ejemplo actual
@@ -66,7 +70,7 @@ def predicePerceptron(weights,X):
     if type(weights).__module__ != np.__name__: weights = np.array(weights)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if len(X) < len(weights): X = np.append([1],X)  #Agregar 1s a la izq
-    return netF(X,weights)
+    return netE(X,weights)
 
 #Falta graficar la sigmoidal
 #Nos deberian dar una theta normalizada y una X normalizada, Y debe ser 1 o 0
@@ -77,11 +81,11 @@ def graficaErrores(errores):
 if __name__ == '__main__':
     fileToUse = "dataOR.csv"
     xData,yData = getDataFromFile(fileToUse)
-    pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
-    print fileToUse
-    print "w :",pesosPerc
-    for x,y in zip(xData,yData): #Validar que es correcta la prediccion
-        print x,":",predicePerceptron(pesosPerc,x)    
-    graficaErrores(erroresPerc)
+    # pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
+    # print fileToUse
+    # print "w :",pesosPerc
+    # for x,y in zip(xData,yData): #Validar que es correcta la prediccion
+    #     print x,":",predicePerceptron(pesosPerc,x)    
+    # graficaErrores(erroresPerc)
     res = entrenaAdaline(xData,yData)
 
