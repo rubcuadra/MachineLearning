@@ -17,7 +17,7 @@ def getDataFromFile(filename):
 
 #Funcion net, hipothesis
 def net(vX,vW):
-    return vW.transpose().dot(vX)
+    return  1 if vW.transpose().dot(vX)>=0.5 else 0
 
 #Funcion escalon de net
 def netE( vX, vW): 
@@ -29,9 +29,9 @@ def netE( vX, vW):
 def entrenaPerceptron(X,Y,weights=None,e=0.001,maxIters=1000,alpha=1):
     return entrenaPerceptron2(**locals())[0] #Solo regresar los pesos que piden
 
-def entrenaAdaline(X,Y,weights=None,e=0.01,alpha=0.01):
+def entrenaAdaline(X,Y,weights=None,e=0.001,alpha=0.001):
     return entrenaAdaline2(**locals())[0] #Solo regresar los pesos que piden
-def entrenaAdaline2(X,Y,weights=None,e=0.01,alpha=0.01):
+def entrenaAdaline2(X,Y,weights=None,e=0.001,alpha=0.001):
     if weights is None: weights = np.array( [random() for i in range(X.shape[1]+1)] ) #Si no nos dieron pesos vacios usar un random
     elif type(weights).__module__ != np.__name__: weights = np.array(weights)
     X = np.append(np.ones((X.shape[0],1)), X , axis=1) #Appendear 1s izq
@@ -45,7 +45,7 @@ def entrenaAdaline2(X,Y,weights=None,e=0.01,alpha=0.01):
                 weights[j] += alpha*cError*X[i][j] #ultimo error*Xs en ejemplo actual
             errors.append(cError)
         #Obtener error cuadratico medio aqui
-        err = sum(np.array(errors[-l:])**2)/2*l
+        err = sum(np.array(errors[-l:])**2)/(2*l)
         if err < e: validError = True #Ya acabara esto
     return weights, errors
         
@@ -80,7 +80,7 @@ def prediceAdaline(weights,X):
     if type(weights).__module__ != np.__name__: weights = np.array(weights)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if len(X) < len(weights): X = np.append([1],X)  #Agregar 1s a la izq
-    return 1 if net(X,weights)>=0.5 else 0
+    return net(X,weights)
 
 #Falta graficar la sigmoidal
 #Nos deberian dar una theta normalizada y una X normalizada, Y debe ser 1 o 0
@@ -94,16 +94,16 @@ if __name__ == '__main__':
     pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
     pesosAda, erroresAda = entrenaAdaline2(xData,yData)
     print fileToUse
-    print "w :",pesosPerc
-    print "w :",pesosAda
+    print "Perceptron :",pesosPerc
+    print "Adaline    :",pesosAda
 
     for x,y in zip(xData,yData): #Validar que es correcta la prediccion
         print x,":",predicePerceptron(pesosPerc,x)    
         print x,":",prediceAdaline(pesosPerc,x)    
         print
 
-    #graficaErrores(erroresPerc)
-    #graficaErrores(erroresAda)
+    graficaErrores(erroresPerc)
+    graficaErrores(erroresAda)
     
 
     
