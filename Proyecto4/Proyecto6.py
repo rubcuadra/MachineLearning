@@ -29,22 +29,27 @@ def netE( vX, vW):
 def entrenaPerceptron(X,Y,weights=None,e=0.01,maxIters=1000,alpha=1):
     return entrenaPerceptron2(**locals())[0] #Solo regresar los pesos que piden
 
-def entrenaAdaline(X,Y,weights=None,maxIters=1000,alpha=1):
+def entrenaAdaline(X,Y,weights=None,e=0.01,maxIters=1000,alpha=0.01):
     if weights is None: weights = np.array( [random() for i in range(X.shape[1]+1)] ) #Si no nos dieron pesos vacios usar un random
     elif type(weights).__module__ != np.__name__: weights = np.array(weights)
     X = np.append(np.ones((X.shape[0],1)), X , axis=1) #Appendear 1s izq
 
     errors = [] #Para graficar, aun no la regresamos
-    
-    for i in range(len(X)): #iterar sobre cada ejemplo
-        ek = Y[i] - net(X[i],weights)
-        #Actualizar pesos
-        #Si los errores cuadraticos medios
-    
-    #NO SE USA EL ESCALON
-    #SACAR EL ERROR, No siempre es 0 o 1
-    #Ajustar con el redondeo
-
+    validError = False
+    while not validError:
+        l = len(X)
+        for i in range(l): #iterar sobre cada ejemplo
+            cError = Y[i] - net(X[i],weights)
+            for j in range(len(weights)):
+                weights[j] += alpha*cError*X[i][j] #ultimo error*Xs en ejemplo actual
+            errors.append(cError)
+        #Obtener error cuadratico medio aqui
+        err = sum(np.array(errors[-l:])**2)/2*l
+        if err < e: validError = True #Ya acabara esto
+        maxIters -= 1
+        if maxIters is 0: break #Que no se quede ahi trabado
+    return weights
+        
 def entrenaPerceptron2(X,Y,weights=None,e=0.01,maxIters=1000,alpha=1):
     if weights is None: weights = np.array( [random() for i in range(X.shape[1]+1)] ) #Si no nos dieron pesos vacios usar un random
     elif type(weights).__module__ != np.__name__: weights = np.array(weights)
@@ -88,4 +93,4 @@ if __name__ == '__main__':
     #     print x,":",predicePerceptron(pesosPerc,x)    
     # graficaErrores(erroresPerc)
     res = entrenaAdaline(xData,yData)
-
+    print res
