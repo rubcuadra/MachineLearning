@@ -68,10 +68,6 @@ def predicePerceptron(weights,X):
     if len(X) < len(weights): X = np.append([1],X)  #Agregar 1s a la izq
     return netF(X,weights)
 
-def funcionCostoPerceptron(weights,X,Y):
-    pass
-
-
 #Falta graficar la sigmoidal
 #Nos deberian dar una theta normalizada y una X normalizada, Y debe ser 1 o 0
 def graficaErrores(errores):
@@ -79,13 +75,13 @@ def graficaErrores(errores):
     plt.show()   # Show the plot
 
 if __name__ == '__main__':
-    fileToUse = "dataAND.csv"
+    fileToUse = "dataOR.csv"
     xData,yData = getDataFromFile(fileToUse)
-    # pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
-    # print fileToUse
-    # print "w :",pesosPerc
-    # for x,y in zip(xData,yData): #Validar que es correcta la prediccion
-    #     print x,":",predicePerceptron(pesosPerc,x)    
-    # graficaErrores(erroresPerc)
+    pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
+    print fileToUse
+    print "w :",pesosPerc
+    for x,y in zip(xData,yData): #Validar que es correcta la prediccion
+        print x,":",predicePerceptron(pesosPerc,x)    
+    graficaErrores(erroresPerc)
     res = entrenaAdaline(xData,yData)
 
