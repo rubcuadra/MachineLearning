@@ -26,14 +26,15 @@ def netE( vX, vW):
 #Alpha es el factor ganancia
 #Max iters es para que no se quede trabado
 #e es la comparacion para considerar un error valido
-def entrenaPerceptron(X,Y,weights=None,e=0.01,maxIters=1000,alpha=1):
+def entrenaPerceptron(X,Y,weights=None,e=0.001,maxIters=1000,alpha=1):
     return entrenaPerceptron2(**locals())[0] #Solo regresar los pesos que piden
 
-def entrenaAdaline(X,Y,weights=None,e=0.01,maxIters=1000,alpha=0.01):
+def entrenaAdaline(X,Y,weights=None,e=0.01,alpha=0.01):
+    return entrenaAdaline2(**locals())[0] #Solo regresar los pesos que piden
+def entrenaAdaline2(X,Y,weights=None,e=0.01,alpha=0.01):
     if weights is None: weights = np.array( [random() for i in range(X.shape[1]+1)] ) #Si no nos dieron pesos vacios usar un random
     elif type(weights).__module__ != np.__name__: weights = np.array(weights)
     X = np.append(np.ones((X.shape[0],1)), X , axis=1) #Appendear 1s izq
-
     errors = [] #Para graficar, aun no la regresamos
     validError = False
     while not validError:
@@ -46,11 +47,9 @@ def entrenaAdaline(X,Y,weights=None,e=0.01,maxIters=1000,alpha=0.01):
         #Obtener error cuadratico medio aqui
         err = sum(np.array(errors[-l:])**2)/2*l
         if err < e: validError = True #Ya acabara esto
-        maxIters -= 1
-        if maxIters is 0: break #Que no se quede ahi trabado
-    return weights
+    return weights, errors
         
-def entrenaPerceptron2(X,Y,weights=None,e=0.01,maxIters=1000,alpha=1):
+def entrenaPerceptron2(X,Y,weights=None,e=0.001,maxIters=1000,alpha=1):
     if weights is None: weights = np.array( [random() for i in range(X.shape[1]+1)] ) #Si no nos dieron pesos vacios usar un random
     elif type(weights).__module__ != np.__name__: weights = np.array(weights)
     X = np.append(np.ones((X.shape[0],1)), X , axis=1) #Appendear 1s izq
@@ -77,6 +76,12 @@ def predicePerceptron(weights,X):
     if len(X) < len(weights): X = np.append([1],X)  #Agregar 1s a la izq
     return netE(X,weights)
 
+def prediceAdaline(weights,X):
+    if type(weights).__module__ != np.__name__: weights = np.array(weights)
+    if type(X).__module__ != np.__name__: X = np.array(X)
+    if len(X) < len(weights): X = np.append([1],X)  #Agregar 1s a la izq
+    return 1 if net(X,weights)>=0.5 else 0
+
 #Falta graficar la sigmoidal
 #Nos deberian dar una theta normalizada y una X normalizada, Y debe ser 1 o 0
 def graficaErrores(errores):
@@ -86,11 +91,19 @@ def graficaErrores(errores):
 if __name__ == '__main__':
     fileToUse = "dataOR.csv"
     xData,yData = getDataFromFile(fileToUse)
-    # pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
-    # print fileToUse
-    # print "w :",pesosPerc
-    # for x,y in zip(xData,yData): #Validar que es correcta la prediccion
-    #     print x,":",predicePerceptron(pesosPerc,x)    
-    # graficaErrores(erroresPerc)
-    res = entrenaAdaline(xData,yData)
-    print res
+    pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
+    pesosAda, erroresAda = entrenaAdaline2(xData,yData)
+    print fileToUse
+    print "w :",pesosPerc
+    print "w :",pesosAda
+
+    for x,y in zip(xData,yData): #Validar que es correcta la prediccion
+        print x,":",predicePerceptron(pesosPerc,x)    
+        print x,":",prediceAdaline(pesosPerc,x)    
+        print
+
+    #graficaErrores(erroresPerc)
+    #graficaErrores(erroresAda)
+    
+
+    
