@@ -89,7 +89,7 @@ def graficaErrores(errores):
     plt.show()   # Show the plot
 
 if __name__ == '__main__':
-    fileToUse = "dataOR.csv"
+    fileToUse = "dataAND.csv"
     xData,yData = getDataFromFile(fileToUse)
     pesosPerc,erroresPerc = entrenaPerceptron2(xData,yData)
     pesosAda, erroresAda = entrenaAdaline2(xData,yData)
