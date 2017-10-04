@@ -29,6 +29,21 @@ def netE( vX, vW):
 def entrenaPerceptron(X,Y,weights=None,e=0.001,maxIters=1000,alpha=1):
     return entrenaPerceptron2(**locals())[0] #Solo regresar los pesos que piden
 
+def funcionCostoAdaline(thetas,X,Y):
+    if type(thetas).__module__ != np.__name__: thetas = np.array(thetas)
+    if type(X).__module__ != np.__name__: X = np.array(X)
+    if type(Y).__module__ != np.__name__: Y = np.array(Y)
+    
+    if len(thetas) > len(X[0]): X = np.append(np.ones((X.shape[0],1)), X , axis=1) 
+    
+    #Inicializar outputs
+    J, grad = 0, thetas.copy()
+    m = len(X) 
+    for i in range(0,m):
+        J += (Y[i]-thetas.transpose().dot(X[i]))**2
+    J /= (2*m)                                      
+    return (J, grad)
+
 def entrenaAdaline(X,Y,weights=None,e=0.001,alpha=0.001):
     return entrenaAdaline2(**locals())[0] #Solo regresar los pesos que piden
 def entrenaAdaline2(X,Y,weights=None,e=0.001,alpha=0.001):
