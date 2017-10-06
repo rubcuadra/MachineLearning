@@ -102,10 +102,23 @@ def bpnUnaNeuronaSigmoidal(weights,layerSize,X,Y,alpha=0.01,activacion=activacio
     elif activacion is activaciones.SIGMOIDAL:
         print "SIGMOIDAL"
 
+#Inicializa aleatoriamente los pesos de una capa que tienen L_in entradas (unidades de la capa anterior, sin contar el bias). 
+#La inicializacion aleatoria se hace para evitar la simetria. Una buena estrategia es generar valores aleatorios en un rango de 
+# Este rango garantiza que los parametros se mantienen pequennos y hacen el aprendizaje mas eficiente.
+def randInicializaPesos(L_in, e=0.12):
+    return np.array( [ -e + 2*e*random() for i in range(L_in)] ) 
+
 if __name__ == '__main__':
     fileToUse = "dataOR.csv"
     xData,yData = getDataFromFile(fileToUse)
-    # bpnUnaNeuronaSigmoidal(None,1,xData,yData,activacion=activaciones.SIGMOIDAL)
+
+    nX, mediasX, sigma = normalizacionDeCaracteristicas(xData)  #Normalizar X
+    nY, mediasY, sigmaY = normalizacionDeCaracteristicas(yData) #Normalizar Y
+
+    inputs = len(xData[0]) 
+    initialWeights = randInicializaPesos(inputs)
+
+    bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,activacion=activaciones.SIGMOIDAL)
 
 
 
