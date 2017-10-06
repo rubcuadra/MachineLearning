@@ -92,19 +92,21 @@ def funcionCostoLineal(thetas, X, Y):
 def linealGradiante(z):
     return 1
 
-def bpnUnaNeuronaSigmoidal(weights,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, iters=1000):
-    if type(weights).__module__ != np.__name__: weights = np.array(weights)
+def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, iters=1000):
+    if type(w).__module__ != np.__name__: w = np.array(w)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
     
     #Inicializar variables
     m  = len(X)                
     b = randInicializaPesos()[0]
+    converged = False
+    weights = w.copy()
 
     if activacion is activaciones.LINEAL:
         print "ES LINEAL"
     elif activacion is activaciones.SIGMOIDAL:
-        for i in range(iters):
+        while iters and not converged:
             #Forward
             z = X.dot(weights) + b
             A = sig(z) #Funcion para la sigmoidal, en lineal A = Z
@@ -116,13 +118,18 @@ def bpnUnaNeuronaSigmoidal(weights,layerSize,X,Y,alpha=0.01,activacion=activacio
             #Updatear pesos
             weights -= alpha*dw
             b       -= alpha*db
+            iters   -= 1
+            #Hacer algo para checar convergencia usando J
     #Regresar pesos y la b
-    return (weights,b)
+    return np.append([b],weights)  
 #Inicializa aleatoriamente los pesos de una capa que tienen L_in entradas (unidades de la capa anterior, sin contar el bias). 
 #La inicializacion aleatoria se hace para evitar la simetria. Una buena estrategia es generar valores aleatorios en un rango de 
 # Este rango garantiza que los parametros se mantienen pequennos y hacen el aprendizaje mas eficiente.
 def randInicializaPesos(L_in=1, e=0.12):
     return np.array( [ -e + 2*e*random() for i in range(L_in)] ) 
+
+def prediceRNYaEntrenada(X,weights,activationFunction):
+    pass
 
 if __name__ == '__main__':
     fileToUse = "dataOR.csv"
@@ -134,8 +141,8 @@ if __name__ == '__main__':
     inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
     initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
 
-    w,b = bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,activacion=activaciones.SIGMOIDAL)
-    print w,b
+    w = bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,activacion=activaciones.SIGMOIDAL)
+    prediction = prediceRNYaEntrenada(xData,w,1)
 
 
 
