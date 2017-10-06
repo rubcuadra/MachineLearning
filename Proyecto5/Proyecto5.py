@@ -97,15 +97,31 @@ def bpnUnaNeuronaSigmoidal(weights,layerSize,X,Y,alpha=0.01,activacion=activacio
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
     
+    #Inicializar variables
+    m  = len(X)                
+    b = randInicializaPesos()[0]
+
     if activacion is activaciones.LINEAL:
         print "ES LINEAL"
     elif activacion is activaciones.SIGMOIDAL:
-        print "SIGMOIDAL"
-
+        for i in range(iters):
+            #Forward
+            z = X.dot(weights) + b
+            A = sig(z) #Funcion para la sigmoidal, en lineal A = Z
+            J = funcionCostoSigmoidal(weights,X,Y) #Evaluar funciones de costo
+            #BackPropagation
+            dz = A - Y  #Derivada de Funcion Costa en terminos a * derivada a en term z
+            dw = X.transpose().dot(dz)/m #dz * X (Promedio /m)
+            db = sum(dz)/m
+            #Updatear pesos
+            weights -= alpha*dw
+            b       -= alpha*db
+    #Regresar pesos y la b
+    return (weights,b)
 #Inicializa aleatoriamente los pesos de una capa que tienen L_in entradas (unidades de la capa anterior, sin contar el bias). 
 #La inicializacion aleatoria se hace para evitar la simetria. Una buena estrategia es generar valores aleatorios en un rango de 
 # Este rango garantiza que los parametros se mantienen pequennos y hacen el aprendizaje mas eficiente.
-def randInicializaPesos(L_in, e=0.12):
+def randInicializaPesos(L_in=1, e=0.12):
     return np.array( [ -e + 2*e*random() for i in range(L_in)] ) 
 
 if __name__ == '__main__':
@@ -118,8 +134,8 @@ if __name__ == '__main__':
     inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
     initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
 
-    bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,activacion=activaciones.SIGMOIDAL)
-
+    w,b = bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,activacion=activaciones.SIGMOIDAL)
+    print w,b
 
 
 
