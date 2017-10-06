@@ -92,7 +92,7 @@ def funcionCostoLineal(thetas, X, Y):
 def linealGradiante(z):
     return 1
 
-def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, iters=1000):
+def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, iters=2000):
     if type(w).__module__ != np.__name__: w = np.array(w)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
@@ -128,8 +128,19 @@ def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LI
 def randInicializaPesos(L_in=1, e=0.12):
     return np.array( [ -e + 2*e*random() for i in range(L_in)] ) 
 
+#Recibe como parametros una matriz de datos X y un vector de pesos,
+#ademas una funcion de activacion
 def prediceRNYaEntrenada(X,weights,activationFunction):
-    pass
+    X = np.append(np.ones((X.shape[0],1)), X , axis=1) #Agregar columnas de 0s
+    return np.apply_along_axis(lambda x:activationFunction(x,weights),1,X)
+
+#Funcion que se pasa como parametro a pediceRNYaEntrenada
+#Recibe el vector xi que representa 1 ejemplo de los datos X
+#pero este ejemplo siempre tiene un numero 1 en la posicion 0
+#util para poder hacer producto punto con el vector weights
+def sigmoidalActivation( xi , weights ):
+    return 1. if xi.dot(weights)>0.5 else 0.
+
 
 if __name__ == '__main__':
     fileToUse = "dataOR.csv"
@@ -142,8 +153,10 @@ if __name__ == '__main__':
     initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
 
     w = bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,activacion=activaciones.SIGMOIDAL)
-    prediction = prediceRNYaEntrenada(xData,w,1)
-
+    prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
+    
+    assert (yData == prediction).all() #Asegurarnos que todas las Y sean iguales a las predicciones
+    
 
 
 
