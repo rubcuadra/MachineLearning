@@ -92,7 +92,7 @@ def funcionCostoLineal(thetas, X, Y):
 def linealGradiante(z):
     return 1
 
-def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, iters=2000):
+def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, iters=3000):
     if type(w).__module__ != np.__name__: w = np.array(w)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
@@ -120,6 +120,7 @@ def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LI
             b       -= alpha*db
             iters   -= 1
             #Hacer algo para checar convergencia usando J
+            #print b,weights
     #Regresar pesos y la b
     return np.append([b],weights)  
 #Inicializa aleatoriamente los pesos de una capa que tienen L_in entradas (unidades de la capa anterior, sin contar el bias). 
@@ -139,11 +140,12 @@ def prediceRNYaEntrenada(X,weights,activationFunction):
 #pero este ejemplo siempre tiene un numero 1 en la posicion 0
 #util para poder hacer producto punto con el vector weights
 def sigmoidalActivation( xi , weights ):
+    #print xi,weights
     return 1. if xi.dot(weights)>0.5 else 0.
 
 
 if __name__ == '__main__':
-    fileToUse = "dataOR.csv"
+    fileToUse = "dataAND.csv"
     xData,yData = getDataFromFile(fileToUse)
 
     nX, mediasX, sigma = normalizacionDeCaracteristicas(xData)  #Normalizar X
@@ -152,7 +154,7 @@ if __name__ == '__main__':
     inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
     initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
 
-    w = bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,activacion=activaciones.SIGMOIDAL)
+    w = bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,alpha=0.1,activacion=activaciones.SIGMOIDAL)
     prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
     
     assert (yData == prediction).all() #Asegurarnos que todas las Y sean iguales a las predicciones
