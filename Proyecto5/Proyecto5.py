@@ -115,8 +115,8 @@ if __name__ == '__main__':
     nX, mediasX, sigma = normalizacionDeCaracteristicas(xData)  #Normalizar X
     nY, mediasY, sigmaY = normalizacionDeCaracteristicas(yData) #Normalizar Y
 
-    inputs = len(xData[0]) 
-    initialWeights = randInicializaPesos(inputs)
+    inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
+    initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
 
     bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,activacion=activaciones.SIGMOIDAL)
 
