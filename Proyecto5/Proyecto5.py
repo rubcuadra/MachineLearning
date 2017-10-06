@@ -143,6 +143,8 @@ def sigmoidalActivation( xi , weights ):
     #print xi,weights
     return 1. if xi.dot(weights)>0.5 else 0.
 
+def linearActivation( xi , weights ):
+    return h( xi,weights )
 
 if __name__ == '__main__':
     fileToUse = "dataAND.csv"
@@ -157,7 +159,12 @@ if __name__ == '__main__':
     w = bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,alpha=0.1,activacion=activaciones.SIGMOIDAL)
     prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
     
-    assert (yData == prediction).all() #Asegurarnos que todas las Y sean iguales a las predicciones
+    if (yData == prediction).all():
+        print "Pasaron las pruebas, predice correctamente"
+    else:
+        print "ERROR", yData, prediction    
+    
+    
     
 
 
