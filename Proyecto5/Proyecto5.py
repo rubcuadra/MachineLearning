@@ -178,6 +178,23 @@ def sigmoidalActivation( xi , weights ):
 def linealActivation( xi , weights ):
     return h( xi,weights )
 
+def graficaSigDatos(X,Y,theta):
+    for _x,_y in zip(X,Y):
+        plt.scatter( *_x, marker="x" if _y else 'o' ) #Puntos X/Y
+
+    #Nos dieron datos crudos pero nuestras thetas estan normalizadas
+    #nX = normalizacionDeCaracteristicas(X)[0]
+    x1_min = np.amin(X,axis=0)[0] -1
+    x1_max = np.amax(X,axis=0)[0] +1
+    #Dos valores es suficiente puesto que es un recta
+    xs = [x1_min, x1_max]
+    #0.5 es la brecha de cuando pasa o no pasa el examen
+    f = lambda x1,th : (0.5-th[0]-th[1]*x1)/th[2]
+    #Evaluar x2 por cada x1
+    plt.plot( xs  , [f(xi,theta) for xi in xs] )
+    #plt.legend() # Add a legend
+    plt.show()   # Show the plot
+
 if __name__ == '__main__':
     if True:
         fileToUse = "dataAND.csv"
@@ -186,6 +203,8 @@ if __name__ == '__main__':
         initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
         w = bpnUnaNeurona(initialWeights,inputs,xData,yData,alpha=0.1,iters=2000,activacion=activaciones.SIGMOIDAL)
         prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
+
+        graficaSigDatos(xData,yData,w)
     else: #Lineal
         fileToUse = "dataCasas.csv"
         xData,yData = getDataFromFile(fileToUse)
