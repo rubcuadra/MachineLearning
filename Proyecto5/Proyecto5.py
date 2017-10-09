@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import numpy as np
 import math, csv, copy
 from random import random
@@ -178,12 +179,16 @@ def sigmoidalActivation( xi , weights ):
 def linealActivation( xi , weights ):
     return h( xi,weights )
 
+#Solo sirve cuando X es una matrix de 2xm
 def graficaSigDatos(X,Y,theta):
+    pX,pY,nX,nY = [],[],[],[]
     for _x,_y in zip(X,Y):
-        plt.scatter( *_x, marker="x" if _y else 'o' ) #Puntos X/Y
-
-    #Nos dieron datos crudos pero nuestras thetas estan normalizadas
-    #nX = normalizacionDeCaracteristicas(X)[0]
+        # plt.scatter( *_x, marker="x" if _y else 'o') #Sin labels jala este
+        if _y: pX.append(_x[0]);pY.append(_x[1])
+        else:  nX.append(_x[0]);nY.append(_x[1])
+    plt.scatter(pX,pY, marker="x", label="True" )
+    plt.scatter(nX,nY, marker="o", label="False" )
+    #Hacer la linea    
     x1_min = np.amin(X,axis=0)[0] -1
     x1_max = np.amax(X,axis=0)[0] +1
     #Dos valores es suficiente puesto que es un recta
@@ -192,7 +197,7 @@ def graficaSigDatos(X,Y,theta):
     f = lambda x1,th : (0.5-th[0]-th[1]*x1)/th[2]
     #Evaluar x2 por cada x1
     plt.plot( xs  , [f(xi,theta) for xi in xs] )
-    #plt.legend() # Add a legend
+    plt.legend() # Add a legend
     plt.show()   # Show the plot
 
 if __name__ == '__main__':
@@ -203,7 +208,6 @@ if __name__ == '__main__':
         initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
         w = bpnUnaNeurona(initialWeights,inputs,xData,yData,alpha=0.1,iters=2000,activacion=activaciones.SIGMOIDAL)
         prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
-
         graficaSigDatos(xData,yData,w)
     else: #Lineal
         fileToUse = "dataCasas.csv"
