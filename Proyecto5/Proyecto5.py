@@ -37,7 +37,7 @@ def normalizacionDeCaracteristicas(X): #VALIDAR SI mu y sigma SON DEL _X o X
 #Pesos
 #Numero de neuronas en la capa
 #Activacion se toma una del enum
-class activaciones(): #(enum) seria lo mejor
+class activaciones(Enum): #seria lo mejor
     LINEAL = "lineal"
     SIGMOIDAL = "sigmoidal"
 
@@ -49,7 +49,6 @@ def h(vX,thetas):
 def sig(z):
     return 1.0/(1.0+np.e**(-z))
 
-#TODO CALCULAR FUNCIONES DE COSTO AGREGANDO LA b
 #X y Y son vectores de misma size
 #Thetas son pesos
 def funcionCostoSigmoidal(thetas,th0,X, Y):
@@ -93,6 +92,37 @@ def funcionCostoLineal(thetas,th0,X, Y):
 def linealGradiante(thetas,xi):
     return 1
 
+#Las funciones que devuelve son funciones que reciben como parametro:
+#   weights : Vector de 1xn (Numero de variables en un ejemplo)
+#   b       : Numero 
+#   X       : Matrix de mxn
+#   Y       : Vector de 1xm (Numero de ejemplos en X)
+def getCostFunction(activation):
+    if activation is activaciones.LINEAL:
+        return funcionCostoLineal
+    elif activation is activaciones.SIGMOIDAL:
+        return funcionCostoSigmoidal
+    else:
+        return None
+
+#Regresa una funcion que recibe como parametro un vector Z y devuelve el vector convertido
+#(usando sigmoidal, escalon,rELU, etc)
+def getAFunction(activation):
+    if activation is activaciones.LINEAL:
+        return lambda z: z
+    elif activation is activaciones.SIGMOIDAL:
+        return lambda z: sig(z)
+    else:
+        return None
+
+#Regresa una funcion que recibe como parametro un 2 vectores de misma size, una A y una Y;
+#Regresa un vector con las mismas dimensiones que estos dos
+def getDZFunction(activation):
+    if activation in [activaciones.LINEAL,activaciones.SIGMOIDAL]:
+        return lambda A,Y: A-Y
+    else:
+        return None
+
 def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,e=0.1,activacion=activaciones.LINEAL, iters=1000):
     if type(w).__module__ != np.__name__: w = np.array(w)
     if type(X).__module__ != np.__name__: X = np.array(X)
@@ -103,41 +133,26 @@ def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,e=0.1,activacion=activaciones.LINEA
     b = randInicializaPesos()[0]
     converged = False
     weights = w.copy()
+    costFunction  = getCostFunction(activacion) #Funcion para calcular J
+    A_Function    = getAFunction(activacion)    #Funcion para calcular A
+    dz_Function   = getDZFunction(activacion)   #Funcion para obtener dz
 
-    if activacion is activaciones.LINEAL:
-        while iters and not converged:
-            #Forward
-            z = X.dot(weights) + b
-            A = z #Al ser lineal se usa mismo valor de hipothesis
-            J = funcionCostoLineal(weights,b,X,Y) #Evaluar funciones de costo
-            #BackPropagation
-            #No tiene sentido, preguntar que pdo
-            dz = A - Y
-            dw = X.transpose().dot(dz)/m #dz * X (Promedio /m)
-            db = sum(dz)/m
-            #Updatear pesos
-            weights -= alpha*dw
-            b       -= alpha*db
-            iters   -= 1
-            if J < e: #Error permitido
-                converged = True
-    elif activacion is activaciones.SIGMOIDAL:
-        while iters and not converged:
-            #Forward
-            z = X.dot(weights) + b
-            A = sig(z) #Funcion para la sigmoidal, en lineal A = Z
-            J = funcionCostoSigmoidal(weights,b,X,Y) #Evaluar funciones de costo
-            #BackPropagation
-            #dz es la funcion sigmoidal gradiente
-            dz = A - Y  #Derivada de Funcion Costa en terminos a * derivada a en term z
-            dw = X.transpose().dot(dz)/m #dz * X (Promedio /m)
-            db = sum(dz)/m
-            #Updatear pesos
-            weights -= alpha*dw
-            b       -= alpha*db
-            iters   -= 1
-            if J < e: #Error permitido
-                converged = True
+    while iters and not converged:
+        #Forward
+        z = X.dot(weights) + b
+        A = A_Function(z) #Funcion para la sigmoidal, en lineal A = Z
+        J = costFunction(weights,b,X,Y) #Evaluar funciones de costo
+        #BackPropagation
+        #dz es la funcion sigmoidal gradiente
+        dz = dz_Function(A,Y)  #Derivada de Funcion Costa en terminos a * derivada a en term z
+        dw = X.transpose().dot(dz)/m #dz * X (Promedio /m)
+        db = sum(dz)/m
+        #Updatear pesos
+        weights -= alpha*dw
+        b       -= alpha*db
+        iters   -= 1
+        if J < e: #Error permitido
+            converged = True
     #Regresar pesos y la b
     return np.append([b],weights)  
 #Inicializa aleatoriamente los pesos de una capa que tienen L_in entradas (unidades de la capa anterior, sin contar el bias). 
@@ -164,17 +179,13 @@ def linealActivation( xi , weights ):
     return h( xi,weights )
 
 if __name__ == '__main__':
-    if False:
+    if True:
         fileToUse = "dataAND.csv"
         xData,yData = getDataFromFile(fileToUse)
         inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
         initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
         w = bpnUnaNeurona(initialWeights,inputs,xData,yData,alpha=0.1,iters=2000,activacion=activaciones.SIGMOIDAL)
         prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
-        if (yData == prediction).all():
-            print "Pasaron las pruebas, predice correctamente"
-        else:
-            print "ERROR", yData, prediction    
     else: #Lineal
         fileToUse = "dataCasas.csv"
         xData,yData = getDataFromFile(fileToUse)
