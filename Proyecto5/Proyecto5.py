@@ -132,6 +132,7 @@ def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,e=0.1,activacion=activaciones.LINEA
     #Inicializar variables
     m  = len(X)                
     b = randInicializaPesos()[0]
+    costs = []
     converged = False
     weights = w.copy()
     costFunction  = getCostFunction(activacion) #Funcion para calcular J
@@ -152,10 +153,11 @@ def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,e=0.1,activacion=activaciones.LINEA
         weights -= alpha*dw
         b       -= alpha*db
         iters   -= 1
+        costs.append(J)
         if J < e: #Error permitido
             converged = True
     #Regresar pesos y la b
-    return np.append([b],weights)  
+    return [np.append([b],weights),costs]
 #Inicializa aleatoriamente los pesos de una capa que tienen L_in entradas (unidades de la capa anterior, sin contar el bias). 
 #La inicializacion aleatoria se hace para evitar la simetria. Una buena estrategia es generar valores aleatorios en un rango de 
 # Este rango garantiza que los parametros se mantienen pequennos y hacen el aprendizaje mas eficiente.
@@ -200,13 +202,18 @@ def graficaSigDatos(X,Y,theta):
     plt.legend() # Add a legend
     plt.show()   # Show the plot
 
+def graficarCostos(Js):
+    plt.plot( Js, label='Historial del error')
+    plt.legend() # Add a legend
+    plt.show()   # Show the plot
+
 if __name__ == '__main__':
-    if True:
+    if False:
         fileToUse = "dataAND.csv"
         xData,yData = getDataFromFile(fileToUse)
         inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
         initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
-        w = bpnUnaNeurona(initialWeights,inputs,xData,yData,alpha=0.1,iters=2000,activacion=activaciones.SIGMOIDAL)
+        w,costos = bpnUnaNeurona(initialWeights,inputs,xData,yData,alpha=0.1,iters=2000,activacion=activaciones.SIGMOIDAL)
         prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
         graficaSigDatos(xData,yData,w)
     else: #Lineal
@@ -216,5 +223,6 @@ if __name__ == '__main__':
         nY, mediasY, sigmaY = normalizacionDeCaracteristicas(yData) #Normalizar Y
         inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
         initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
-        w = bpnUnaNeurona(initialWeights,inputs,nX,nY,alpha=0.001,iters=5000,activacion=activaciones.LINEAL)
+        w,costos = bpnUnaNeurona(initialWeights,inputs,nX,yData,alpha=0.001,iters=5000,activacion=activaciones.LINEAL)
         prediction = prediceRNYaEntrenada(nX,w,linealActivation)
+        graficarCostos(costos)
