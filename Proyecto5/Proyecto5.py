@@ -76,7 +76,7 @@ def sigmoidGradiente(weights,Xi):
     return gz*(1-gz)
 
 #Promedio de los errores al cuadrado
-def funcionCostoLineal(thetas, X, Y):
+def funcionCostoLineal(thetas,th0,X, Y):
     if type(thetas).__module__ != np.__name__: thetas = np.array(thetas)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
@@ -84,7 +84,7 @@ def funcionCostoLineal(thetas, X, Y):
     error = 0
     m = len(X)
     for i in range(m):
-        error += (Y[i]-h(X[i],thetas))**2 #Sumar errores cuadrados
+        error += (Y[i]-(th0 + h(X[i],thetas)))**2 #Sumar errores cuadrados
     error /= m #Obtener promedio
     return error
 
@@ -109,7 +109,7 @@ def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,e=0.1,activacion=activaciones.LINEA
             #Forward
             z = X.dot(weights) + b
             A = z #Al ser lineal se usa mismo valor de hipothesis
-            J = funcionCostoLineal(weights,X,Y) #Evaluar funciones de costo
+            J = funcionCostoLineal(weights,b,X,Y) #Evaluar funciones de costo
             #BackPropagation
             #No tiene sentido, preguntar que pdo
             dz = A - Y
@@ -119,6 +119,8 @@ def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,e=0.1,activacion=activaciones.LINEA
             weights -= alpha*dw
             b       -= alpha*db
             iters   -= 1
+            if J < e: #Error permitido
+                converged = True
     elif activacion is activaciones.SIGMOIDAL:
         while iters and not converged:
             #Forward
@@ -162,7 +164,7 @@ def linealActivation( xi , weights ):
     return h( xi,weights )
 
 if __name__ == '__main__':
-    if True:
+    if False:
         fileToUse = "dataAND.csv"
         xData,yData = getDataFromFile(fileToUse)
         inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
@@ -180,7 +182,5 @@ if __name__ == '__main__':
         nY, mediasY, sigmaY = normalizacionDeCaracteristicas(yData) #Normalizar Y
         inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
         initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
-        w = bpnUnaNeurona(initialWeights,inputs,nX,nY,alpha=0.001,iters=8000,activacion=activaciones.LINEAL)
+        w = bpnUnaNeurona(initialWeights,inputs,nX,nY,alpha=0.001,iters=5000,activacion=activaciones.LINEAL)
         prediction = prediceRNYaEntrenada(nX,w,linealActivation)
-
-    
