@@ -208,7 +208,8 @@ def graficarCostos(Js):
     plt.show()   # Show the plot
 
 if __name__ == '__main__':
-    if False:
+    sigmoidal = True #False -> Lineal
+    if sigmoidal:
         fileToUse = "dataAND.csv"
         xData,yData = getDataFromFile(fileToUse)
         inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
