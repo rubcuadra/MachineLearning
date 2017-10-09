@@ -52,7 +52,7 @@ def sig(z):
 #TODO CALCULAR FUNCIONES DE COSTO AGREGANDO LA b
 #X y Y son vectores de misma size
 #Thetas son pesos
-def funcionCostoSigmoidal(thetas, X, Y):
+def funcionCostoSigmoidal(thetas,th0,X, Y):
     if type(thetas).__module__ != np.__name__: thetas = np.array(thetas)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
@@ -60,7 +60,7 @@ def funcionCostoSigmoidal(thetas, X, Y):
     J = 0
     m = len(X) 
     for i in range(0,m):
-        sigEval = sig(h(X[i],thetas))
+        sigEval = sig( h(X[i],thetas) + th0 )
         pt = -1*Y[i] *np.log(sigEval)
         pf = (1-Y[i])*np.log(1-sigEval)
         J += pt - pf                
@@ -124,7 +124,7 @@ def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, ite
             #Forward
             z = X.dot(weights) + b
             A = sig(z) #Funcion para la sigmoidal, en lineal A = Z
-            J = funcionCostoSigmoidal(weights,X,Y) #Evaluar funciones de costo
+            J = funcionCostoSigmoidal(weights,b,X,Y) #Evaluar funciones de costo
             #BackPropagation
             #dz es la funcion sigmoidal gradiente
             dz = A - Y  #Derivada de Funcion Costa en terminos a * derivada a en term z
@@ -134,6 +134,7 @@ def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, ite
             weights -= alpha*dw
             b       -= alpha*db
             iters   -= 1
+            print J
             #Hacer algo para checar convergencia usando J
     #Regresar pesos y la b
     return np.append([b],weights)  
@@ -161,7 +162,7 @@ def linealActivation( xi , weights ):
     return h( xi,weights )
 
 if __name__ == '__main__':
-    if False:
+    if True:
         fileToUse = "dataAND.csv"
         xData,yData = getDataFromFile(fileToUse)
         inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
