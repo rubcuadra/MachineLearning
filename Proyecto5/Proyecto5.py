@@ -93,7 +93,7 @@ def funcionCostoLineal(thetas, X, Y):
 def linealGradiante(thetas,xi):
     return 1
 
-def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, iters=1000):
+def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,e=0.1,activacion=activaciones.LINEAL, iters=1000):
     if type(w).__module__ != np.__name__: w = np.array(w)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
@@ -134,8 +134,8 @@ def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, ite
             weights -= alpha*dw
             b       -= alpha*db
             iters   -= 1
-            print J
-            #Hacer algo para checar convergencia usando J
+            if J < e: #Error permitido
+                converged = True
     #Regresar pesos y la b
     return np.append([b],weights)  
 #Inicializa aleatoriamente los pesos de una capa que tienen L_in entradas (unidades de la capa anterior, sin contar el bias). 
@@ -169,8 +169,6 @@ if __name__ == '__main__':
         initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
         w = bpnUnaNeurona(initialWeights,inputs,xData,yData,alpha=0.1,iters=2000,activacion=activaciones.SIGMOIDAL)
         prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
-        print w
-        print prediction
         if (yData == prediction).all():
             print "Pasaron las pruebas, predice correctamente"
         else:
