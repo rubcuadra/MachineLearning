@@ -49,6 +49,7 @@ def h(vX,thetas):
 def sig(z):
     return 1.0/(1.0+np.e**(-z))
 
+#TODO CALCULAR FUNCIONES DE COSTO AGREGANDO LA b
 #X y Y son vectores de misma size
 #Thetas son pesos
 def funcionCostoSigmoidal(thetas, X, Y):
@@ -89,10 +90,10 @@ def funcionCostoLineal(thetas, X, Y):
 
 #El gradiente para la funcion lineal es 1, g'(z) = d g(z)/dz = 1
 #donde g(z) = z; Derivada del costo
-def linealGradiante(z):
+def linealGradiante(thetas,xi):
     return 1
 
-def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, iters=3000):
+def bpnUnaNeurona(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LINEAL, iters=1000):
     if type(w).__module__ != np.__name__: w = np.array(w)
     if type(X).__module__ != np.__name__: X = np.array(X)
     if type(Y).__module__ != np.__name__: Y = np.array(Y)
@@ -104,7 +105,20 @@ def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LI
     weights = w.copy()
 
     if activacion is activaciones.LINEAL:
-        print "ES LINEAL"
+        while iters and not converged:
+            #Forward
+            z = X.dot(weights) + b
+            A = z #Al ser lineal se usa mismo valor de hipothesis
+            J = funcionCostoLineal(weights,X,Y) #Evaluar funciones de costo
+            #BackPropagation
+            #No tiene sentido, preguntar que pdo
+            dz = A - Y
+            dw = X.transpose().dot(dz)/m #dz * X (Promedio /m)
+            db = sum(dz)/m
+            #Updatear pesos
+            weights -= alpha*dw
+            b       -= alpha*db
+            iters   -= 1
     elif activacion is activaciones.SIGMOIDAL:
         while iters and not converged:
             #Forward
@@ -112,6 +126,7 @@ def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LI
             A = sig(z) #Funcion para la sigmoidal, en lineal A = Z
             J = funcionCostoSigmoidal(weights,X,Y) #Evaluar funciones de costo
             #BackPropagation
+            #dz es la funcion sigmoidal gradiente
             dz = A - Y  #Derivada de Funcion Costa en terminos a * derivada a en term z
             dw = X.transpose().dot(dz)/m #dz * X (Promedio /m)
             db = sum(dz)/m
@@ -120,7 +135,6 @@ def bpnUnaNeuronaSigmoidal(w,layerSize,X,Y,alpha=0.01,activacion=activaciones.LI
             b       -= alpha*db
             iters   -= 1
             #Hacer algo para checar convergencia usando J
-            #print b,weights
     #Regresar pesos y la b
     return np.append([b],weights)  
 #Inicializa aleatoriamente los pesos de una capa que tienen L_in entradas (unidades de la capa anterior, sin contar el bias). 
@@ -143,30 +157,31 @@ def sigmoidalActivation( xi , weights ):
     #print xi,weights
     return 1. if xi.dot(weights)>0.5 else 0.
 
-def linearActivation( xi , weights ):
+def linealActivation( xi , weights ):
     return h( xi,weights )
 
 if __name__ == '__main__':
-    fileToUse = "dataAND.csv"
-    xData,yData = getDataFromFile(fileToUse)
-
-    nX, mediasX, sigma = normalizacionDeCaracteristicas(xData)  #Normalizar X
-    nY, mediasY, sigmaY = normalizacionDeCaracteristicas(yData) #Normalizar Y
-
-    inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
-    initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
-
-    w = bpnUnaNeuronaSigmoidal(initialWeights,inputs,xData,yData,alpha=0.1,activacion=activaciones.SIGMOIDAL)
-    prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
-    
-    if (yData == prediction).all():
-        print "Pasaron las pruebas, predice correctamente"
-    else:
-        print "ERROR", yData, prediction    
-    
-    
-    
-
-
+    if False:
+        fileToUse = "dataAND.csv"
+        xData,yData = getDataFromFile(fileToUse)
+        inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
+        initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
+        w = bpnUnaNeurona(initialWeights,inputs,xData,yData,alpha=0.1,iters=2000,activacion=activaciones.SIGMOIDAL)
+        prediction = prediceRNYaEntrenada(xData,w,sigmoidalActivation)
+        print w
+        print prediction
+        if (yData == prediction).all():
+            print "Pasaron las pruebas, predice correctamente"
+        else:
+            print "ERROR", yData, prediction    
+    else: #Lineal
+        fileToUse = "dataCasas.csv"
+        xData,yData = getDataFromFile(fileToUse)
+        nX, mediasX, sigma = normalizacionDeCaracteristicas(xData)  #Normalizar X
+        nY, mediasY, sigmaY = normalizacionDeCaracteristicas(yData) #Normalizar Y
+        inputs = len(xData[0])                          #Numero de entradas sin contar b para una neurona
+        initialWeights = randInicializaPesos(inputs)    #Inicializar pesos para ese numero de entradas
+        w = bpnUnaNeurona(initialWeights,inputs,nX,nY,alpha=0.001,iters=8000,activacion=activaciones.LINEAL)
+        prediction = prediceRNYaEntrenada(nX,w,linealActivation)
 
     
