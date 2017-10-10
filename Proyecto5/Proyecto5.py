@@ -208,7 +208,7 @@ def graficarCostos(Js):
     plt.show()   # Show the plot
 
 if __name__ == '__main__':
-    sigmoidal = True #False -> Lineal
+    sigmoidal = False #False -> Lineal
     if sigmoidal:
         fileToUse = "dataAND.csv"
         xData,yData = getDataFromFile(fileToUse)
