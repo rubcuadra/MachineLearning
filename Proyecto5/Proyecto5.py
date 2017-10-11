@@ -18,10 +18,10 @@ def getDataFromFile(filename):
             val[1].append( float( i[-1] )  )
     return [np.array(val[0]),np.array(val[1])]
 
-def normalizarMedia(vector): #Vector con valores de X
+def normalizar(vector): #Vector con valores de X
     media = vector.mean()
-    #rango = vector.max() - vector.min()             
-    sigma = vector.std()
+    #rango = vector.max() - vector.min()    #Por media        
+    sigma = vector.std()                    #Por devStd
     f = np.vectorize( lambda xi: (xi-media)/sigma   ) #Normalizar
     return f(vector)                                  #Evalua cada valor del vector
 
@@ -31,7 +31,7 @@ def normalizarMedia(vector): #Vector con valores de X
 #   Un vector sigma que contiene las deviaciones estandares por columna
 def normalizacionDeCaracteristicas(X): #VALIDAR SI mu y sigma SON DEL _X o X
     if type(X).__module__ != np.__name__: X = np.array(X)
-    _X = np.apply_along_axis( normalizarMedia , 0, X) #Normalizar por cada columna de X
+    _X = np.apply_along_axis( normalizar , 0, X) #Normalizar por cada columna de X
     mu = np.mean(X,axis=0)                            #Vector con medias
     sigma = np.std(X,axis=0)                          #Deviaciones estandares
     return (_X,mu,sigma)
