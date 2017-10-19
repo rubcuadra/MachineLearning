@@ -27,7 +27,7 @@ def normalizar(vector): #Vector con valores de X
 
 #Recibe una matrix X y regresa:
 #   Una matrix _X normalizada usando la media por columna
-#   Un vector mu que contiene las medias de cada columna
+#   Un vector mu que contiene las  medias de cada columna
 #   Un vector sigma que contiene las deviaciones estandares por columna
 def normalizacionDeCaracteristicas(X): #VALIDAR SI mu y sigma SON DEL _X o X
     if type(X).__module__ != np.__name__: X = np.array(X)
@@ -209,7 +209,7 @@ def graficarCostos(Js):
     plt.show()   # Show the plot
 
 if __name__ == '__main__':
-    sigmoidal = False #False -> Lineal
+    sigmoidal = True #False -> Lineal
     if sigmoidal:
         fileToUse = "dataAND.csv"
         xData,yData = getDataFromFile(fileToUse)
