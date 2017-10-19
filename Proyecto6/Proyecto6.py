@@ -113,8 +113,7 @@ def entrenaRN(X,y,hidden_layers_sizes):
     input_layer_size = len( X[0] )
     num_labels       = len( np.unique(y) )
     total_layers     = len( hidden_layers_sizes )
-    p                = {}
-    
+    p                = {"A0":X} #Para iterar despues
     
     #Generar pesos aleatorios iniciales, pasar a una funcion que nos devuelva el dictionary
     #+[num_labels] donde num_labels es la cantidad de neuronas en la capa final(Categorias para clasificar)
@@ -124,7 +123,6 @@ def entrenaRN(X,y,hidden_layers_sizes):
         p["W%s"%i] = randInicializacionPesos(l_in,layer_size)
         p["b%s"%i] = randInicializacionPesos(1,layer_size)   #Obtener solo la b para cada neurona
         l_in = layer_size        
-    p["A0"] = X #Importante para poder iterar despues
 
     #Iterar por cada capa, de momento la getAFunction sera igual entre todas las neuronas de esa capa
     #FORWARD PROPAGATION
@@ -132,13 +130,14 @@ def entrenaRN(X,y,hidden_layers_sizes):
         activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
         A_Function    = getAFunction(activacion)    #Funcion para calcular A
         dz_Function   = getDZFunction(activacion)   #Funcion para obtener dz
-        Zi    = "Z%s"%(i+1)
-        Wi    = "W%s"%(i+1)
-        bi    = "b%s"%(i+1)
-        Ai,Ap = "A%s"%(i+1),"A%s"%(i)
-        p[Zi]  = p[Wi].dot( p[Ap].T) + p[bi]
-        p[Ai]  = A_Function(  p[Zi]  )
+        Zi, Wi, bi    = "Z%s"%(i+1), "W%s"%(i+1), "b%s"%(i+1)
+        Ai, Ap  = "A%s"%(i+1),"A%s"%(i)
+        p[Zi]   = p[Wi].dot( p[Ap].T) + p[bi]
+        p[Ai]   = A_Function(  p[Zi]  )
     
+    #Falta FORWARD para la capa final, esa es sigmoidal. W%s % total_layers+1
+
+
     for key in p:
         print key
 
