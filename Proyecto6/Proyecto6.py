@@ -136,7 +136,14 @@ def entrenaRN(X,y,hidden_layers_sizes):
         p[Ai]   = A_Function(  p[Zi]  )
     
     #Falta FORWARD para la capa final, esa es sigmoidal. W%s % total_layers+1
-
+    activacionFinal = activaciones.SIGMOIDAL
+    A_Function    = getAFunction(activacion)    #Funcion para calcular A
+    dz_Function   = getDZFunction(activacion)   #Funcion para obtener dz
+    i = total_layers+1                          #Poner la capa final
+    Zi, Wi, bi    = "Z%s"%(i+1), "W%s"%(i+1), "b%s"%(i+1)
+    Ai, Ap  = "A%s"%(i+1),"A%s"%(i)
+    p[Zi]   = p[Wi].dot( p[Ap].T) + p[bi]
+    p[Ai]   = A_Function(  p[Zi]  )
 
     for key in p:
         print key
