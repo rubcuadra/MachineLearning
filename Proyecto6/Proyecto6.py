@@ -119,6 +119,7 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000):
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers_sizes )
     p                = {"A0":X.T} #Para iterar despues
+    m                = p["A0"].shape[1]
     print "A0",p["A0"].shape
     #Generar pesos aleatorios iniciales, pasar a una funcion que nos devuelva el dictionary
     #+[num_labels] donde num_labels es la cantidad de neuronas en la capa final(Categorias para clasificar)
@@ -163,13 +164,26 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000):
     dZi, dWi, dbi    = "dZ%s"%i, "dW%s"%i,"db%s"%i
     p[dZi] = p[Ai] - Y #Checar lo de las Ys y el vector de 10 posiciones
     p[dWi] = p[dZi].T.dot(p[Ai])
-    p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/p[dZi].shape[1]
+    p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
     print dZi,p[dZi].shape
     print dWi,p[dWi].shape
     print dbi,p[dbi].shape
     #Backward demas Capas
     for i,layer in reverse_enum(hidden_layers_sizes):
-       print i, layer
+        i += 1
+        activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
+        dz_Function   = getDZFunction(activacion)
+        dZi, dWi, dbi    = "dZ%s"%i, "dW%s"%i,"db%s"%i
+        dZn, dWn,      = "dZ%s"%(i+1), "dW%s"%(i+1)
+        Zi , Ai = "Z%s"%i,"A%s"%i
+        p[dZi] = p[dWn].dot( p[dZn].T) # * dz_Function( p[Zi] )
+        p[dWi] = p[dZi].T.dot( p[Ai].T )/m
+        p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
+        print dZi,p[dZi].shape
+        print dWi,p[dWi].shape
+        print dbi,p[dbi].shape
+    #Ajustar pesos
+
 #Para una capa
 #   L_in  seria la size del vector Wi
 #   L_out seria la cantidad de neuronas en la capa, valor maximo de i en Wi
