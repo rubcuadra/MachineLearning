@@ -11,6 +11,10 @@ class activaciones(Enum): #seria lo mejor
     LINEAL = "lineal"
     SIGMOIDAL = "sigmoidal"
 
+def reverse_enum(L):
+    for index in reversed(xrange(len(L))):
+        yield index, L[index]
+
 #El formato es archivos donde cada linea contiene multiples numeros (entre -1 y 1) separados por un espacio, el ultimo numero representa una etiqueta para esos valores
 #Ej. "1 0 0 0 -1 0 0 -0.12312 0.21321321 0 6", donde 6 seria la etiqueta para esos valores
 def getDataFromFile(filename,limit=float("inf"),delimiter=" "):  
@@ -19,8 +23,9 @@ def getDataFromFile(filename,limit=float("inf"),delimiter=" "):
         reader = csv.reader(f, delimiter=delimiter)
         for c,i in enumerate(reader):
             if c >= limit: break #No cargar todos los numeros de golpe
-            val[0].append( [float(j) for j in i[0: len(i)-1]])
-            val[1].append( float( i[-1] )  )
+            if i: #Caracteres ''
+                val[0].append( [float(j) for j in i[0: len(i)-1]])
+                val[1].append( float( i[-1] )  )
     return [np.array(val[0]),np.array(val[1])]
 
 #Hipothesis a usar, Vector vX con valores en X y vector thetas
@@ -109,12 +114,12 @@ def getDZFunction(activation):
 #num_labels es la cantidad de salidas en la red, cada salida representa un posible grupo al que pertenece el ejemplo, para detectar digitos existen 10 salidas 0-9
 #y el valor de las etiquetas
 #X cada valor posee un ejemplo
-def entrenaRN(X,y,hidden_layers_sizes):
+def entrenaRN(X,Y,hidden_layers_sizes,iters=1000):
     input_layer_size = len( X[0] )
-    num_labels       = len( np.unique(y) )
+    num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers_sizes )
-    p                = {"A0":X} #Para iterar despues
-    
+    p                = {"A0":X.T} #Para iterar despues
+    print "A0",p["A0"].shape
     #Generar pesos aleatorios iniciales, pasar a una funcion que nos devuelva el dictionary
     #+[num_labels] donde num_labels es la cantidad de neuronas en la capa final(Categorias para clasificar)
     l_in = input_layer_size
@@ -122,34 +127,49 @@ def entrenaRN(X,y,hidden_layers_sizes):
         i+=1
         p["W%s"%i] = randInicializacionPesos(l_in,layer_size)
         p["b%s"%i] = randInicializacionPesos(1,layer_size)   #Obtener solo la b para cada neurona
-        l_in = layer_size        
+        l_in = layer_size   
 
+    #AQUI EMPIEZA LA ITERACION
+    # for i in xrange(iters):    
     #Iterar por cada capa, de momento la getAFunction sera igual entre todas las neuronas de esa capa
     #FORWARD PROPAGATION
-    for i,_ in enumerate(hidden_layers_sizes):
+    for i,layer in enumerate(hidden_layers_sizes):
         activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
         A_Function    = getAFunction(activacion)    #Funcion para calcular A
         Zi, Wi, bi    = "Z%s"%(i+1), "W%s"%(i+1), "b%s"%(i+1)
         Ai, Ap  = "A%s"%(i+1),"A%s"%(i)
-        p[Zi]   = p[Wi].dot( p[Ap].T) + p[bi]
+        p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi]
         p[Ai]   = A_Function(  p[Zi]  )
-    
-    #FORWARD para la capa final, esa es sigmoidal
+        print Wi,p[Wi].shape
+        print bi,p[bi].shape
+        print Ai,p[Ai].shape
+        print Zi,p[Zi].shape
+    #Trabajar sobre la capa final
+    i = total_layers+1                      
+    #FORWARD Capa Final - Sigmoidal
     activacionFinal = activaciones.SIGMOIDAL
     A_Function    = getAFunction(activacion)    #Funcion para calcular A
-    i = total_layers+1                          #Poner la capa final
     Zi, Wi, bi    = "Z%s"%i, "W%s"%i,"b%s"%i
     Ai, Ap  = "A%s"%i,"A%s"%(i-1)
     p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi] #Por que no se tuvo que hacer T ??
     p[Ai]   = A_Function(  p[Zi]  )
-
-    for key in p:
-        print key
-
-    #print p["A1"]
-
-
-
+    print Wi,p[Wi].shape
+    print bi,p[bi].shape
+    print Ai,p[Ai].shape
+    print Zi,p[Zi].shape
+    # J = getCosto(  )
+    #Backward Capa Final - Sigmoidal
+    dz_Function   = getDZFunction(activacion)
+    dZi, dWi, dbi    = "dZ%s"%i, "dW%s"%i,"db%s"%i
+    p[dZi] = p[Ai] - Y #Checar lo de las Ys y el vector de 10 posiciones
+    p[dWi] = p[dZi].T.dot(p[Ai])
+    p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/p[dZi].shape[1]
+    print dZi,p[dZi].shape
+    print dWi,p[dWi].shape
+    print dbi,p[dbi].shape
+    #Backward demas Capas
+    for i,layer in reverse_enum(hidden_layers_sizes):
+       print i, layer
 #Para una capa
 #   L_in  seria la size del vector Wi
 #   L_out seria la cantidad de neuronas en la capa, valor maximo de i en Wi
@@ -160,6 +180,6 @@ def randInicializacionPesos(L_in,L_out,e=0.12):
     return np.array(weights)
 
 if __name__ == '__main__':
-    xExamples,tags = getDataFromFile("digitos.txt",limit=10)
+    xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
     entrenaRN(xExamples,tags,[25])
