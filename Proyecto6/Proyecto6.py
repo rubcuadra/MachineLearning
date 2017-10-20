@@ -114,7 +114,7 @@ def getDZFunction(activation):
 #num_labels es la cantidad de salidas en la red, cada salida representa un posible grupo al que pertenece el ejemplo, para detectar digitos existen 10 salidas 0-9
 #y el valor de las etiquetas
 #X cada valor posee un ejemplo
-def entrenaRN(X,Y,hidden_layers_sizes,iters=1,alpha=0.001):
+def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
     input_layer_size = len( X[0] )
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers_sizes )
@@ -160,7 +160,9 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1,alpha=0.001):
         # print bi,p[bi].shape
         # print Ai,p[Ai].shape
         # print Zi,p[Zi].shape
+        
         # J = getCosto(  )
+        
         #Backward Capa Final - Sigmoidal
         dz_Function   = getDZFunction(activacion)
         dZi, dWi, dbi    = "dZ%s"%i, "dW%s"%i,"db%s"%i
@@ -201,4 +203,4 @@ def randInicializacionPesos(L_in,L_out,e=0.12):
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
-    entrenaRN(xExamples,tags,[25])
+    entrenaRN(xExamples,tags,[25],iters=1)
