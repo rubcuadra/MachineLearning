@@ -120,7 +120,9 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1,alpha=0.001):
     total_layers     = len( hidden_layers_sizes )
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
-    print "A0",p["A0"].shape
+    # print "A0",p["A0"].shape
+    # print "Y" ,Y.shape
+    
     #Generar pesos aleatorios iniciales, pasar a una funcion que nos devuelva el dictionary
     #+[num_labels] donde num_labels es la cantidad de neuronas en la capa final(Categorias para clasificar)
     l_in = input_layer_size
@@ -141,10 +143,10 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1,alpha=0.001):
             Ai, Ap  = "A%s"%(i+1),"A%s"%(i)
             p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi]
             p[Ai]   = A_Function(  p[Zi]  )
-            print Wi,p[Wi].shape
-            print bi,p[bi].shape
-            print Ai,p[Ai].shape
-            print Zi,p[Zi].shape
+            # print Wi,p[Wi].shape
+            # print bi,p[bi].shape
+            # print Ai,p[Ai].shape
+            # print Zi,p[Zi].shape
         #Trabajar sobre la capa final
         i = total_layers+1                      
         #FORWARD Capa Final - Sigmoidal
@@ -154,20 +156,21 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1,alpha=0.001):
         Ai, Ap  = "A%s"%i,"A%s"%(i-1)
         p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi] #Por que no se tuvo que hacer T ??
         p[Ai]   = A_Function(  p[Zi]  )
-        print Wi,p[Wi].shape
-        print bi,p[bi].shape
-        print Ai,p[Ai].shape
-        print Zi,p[Zi].shape
+        # print Wi,p[Wi].shape
+        # print bi,p[bi].shape
+        # print Ai,p[Ai].shape
+        # print Zi,p[Zi].shape
         # J = getCosto(  )
         #Backward Capa Final - Sigmoidal
         dz_Function   = getDZFunction(activacion)
         dZi, dWi, dbi    = "dZ%s"%i, "dW%s"%i,"db%s"%i
         p[dZi] = p[Ai] - Y #Checar lo de las Ys y el vector de 10 posiciones
-        p[dWi] = p[dZi].T.dot(p[Ai])
+        p[dWi] = p[dZi].dot(p[Ap].T)
         p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
-        print dZi,p[dZi].shape
-        print dWi,p[dWi].shape
-        print dbi,p[dbi].shape
+        # print dZi,p[dZi].shape
+        # print dWi,p[dWi].shape
+        # print dbi,p[dbi].shape
+
         #Backward demas Capas
         for i,layer in reverse_enum(hidden_layers_sizes):
             i += 1
@@ -175,16 +178,16 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1,alpha=0.001):
             dz_Function   = getDZFunction(activacion)
             dZi, dWi, dbi = "dZ%s"%i, "dW%s"%i,"db%s"%i
             dZn, dWn      = "dZ%s"%(i+1), "dW%s"%(i+1)
-            Zi , Ai, Wi   = "Z%s"%i,"A%s"%i, "W%s"%i
-            p[dZi] = p[dWn].dot( p[dZn].T) # * g'( p[Zi] ) g' se debe obtener de otra funcion
-            p[dWi] = p[dZi].T.dot( p[Ai].T )/m
-            p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
-            #Ajustar pesos    
-            p[Wi]  = p[Wi] - alpha*p[dWi]
-            p[bi]  = p[bi] - alpha*p[dbi]
-            print dZi,p[dZi].shape
-            print dWi,p[dWi].shape
-            print dbi,p[dbi].shape
+            Zi , Ap, Wi   = "Z%s"%i,"A%s"%(i-1), "W%s"%i
+            bi = "b%s"%i
+            Wn = "W%s"%(i+1)
+            p[dZi] = p[Wn].T.dot( p[dZn] ) # * g'( p[Zi] ) g' se debe obtener de otra funcion
+            p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)
+            p[dWi] = p[dZi].dot( p[Ap].T )        
+            # #Ajustar pesos    
+            p[Wi]  = p[Wi] - p[dWi]*alpha/m
+            p[bi]  = p[bi] - p[dbi]*alpha/m
+            
     
 #Para una capa
 #   L_in  seria la size del vector Wi
