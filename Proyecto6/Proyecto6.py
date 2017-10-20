@@ -109,6 +109,21 @@ def getDZFunction(activation):
     else:
         return None
 
+def getCosto(Y): 
+    #k posibles etiqueras 
+    print Y.shape
+    #pt = -1*Y[i] *np.log(sigEval)
+    #pf = (1-Y[i])*np.log(1-sigEval)
+    return 0
+
+def getYsAsMatrix(totalLabels):
+    # m    = []
+    # for i in range(totalLabels):
+    #     t = np.zeros( totalLabels )
+    #     t[i] = 1. #Solo nos dice a que grupo pertenece
+    #     m.append( t )
+    return np.identity(totalLabels)
+
 #input_layer_size representa la cantidad de entradas para cada ejemplo, en una imagen de 20x20 tendria un size de 400
 #hidden_layer_size representa la cantidad de neuronas en la capa de enmedio(Deberia ser un vector si queremos N capas)
 #num_labels es la cantidad de salidas en la red, cada salida representa un posible grupo al que pertenece el ejemplo, para detectar digitos existen 10 salidas 0-9
@@ -118,6 +133,7 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
     input_layer_size = len( X[0] )
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers_sizes )
+    fixedYs          = getYsAsMatrix(num_labels)  
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
     # print "A0",p["A0"].shape
@@ -161,7 +177,7 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
         # print Ai,p[Ai].shape
         # print Zi,p[Zi].shape
         
-        # J = getCosto(  )
+        J = getCosto( fixedYs )
         
         #Backward Capa Final - Sigmoidal
         dz_Function   = getDZFunction(activacion)
