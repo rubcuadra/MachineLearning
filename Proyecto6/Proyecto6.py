@@ -114,7 +114,7 @@ def getDZFunction(activation):
 #num_labels es la cantidad de salidas en la red, cada salida representa un posible grupo al que pertenece el ejemplo, para detectar digitos existen 10 salidas 0-9
 #y el valor de las etiquetas
 #X cada valor posee un ejemplo
-def entrenaRN(X,Y,hidden_layers_sizes,iters=1000):
+def entrenaRN(X,Y,hidden_layers_sizes,iters=1,alpha=0.001):
     input_layer_size = len( X[0] )
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers_sizes )
@@ -131,59 +131,61 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000):
         l_in = layer_size   
 
     #AQUI EMPIEZA LA ITERACION
-    # for i in xrange(iters):    
-    #Iterar por cada capa, de momento la getAFunction sera igual entre todas las neuronas de esa capa
-    #FORWARD PROPAGATION
-    for i,layer in enumerate(hidden_layers_sizes):
-        activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
+    for i in xrange(iters):    
+        #Iterar por cada capa, de momento la getAFunction sera igual entre todas las neuronas de esa capa
+        #FORWARD PROPAGATION
+        for i,layer in enumerate(hidden_layers_sizes):
+            activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
+            A_Function    = getAFunction(activacion)    #Funcion para calcular A
+            Zi, Wi, bi    = "Z%s"%(i+1), "W%s"%(i+1), "b%s"%(i+1)
+            Ai, Ap  = "A%s"%(i+1),"A%s"%(i)
+            p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi]
+            p[Ai]   = A_Function(  p[Zi]  )
+            print Wi,p[Wi].shape
+            print bi,p[bi].shape
+            print Ai,p[Ai].shape
+            print Zi,p[Zi].shape
+        #Trabajar sobre la capa final
+        i = total_layers+1                      
+        #FORWARD Capa Final - Sigmoidal
+        activacionFinal = activaciones.SIGMOIDAL
         A_Function    = getAFunction(activacion)    #Funcion para calcular A
-        Zi, Wi, bi    = "Z%s"%(i+1), "W%s"%(i+1), "b%s"%(i+1)
-        Ai, Ap  = "A%s"%(i+1),"A%s"%(i)
-        p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi]
+        Zi, Wi, bi    = "Z%s"%i, "W%s"%i,"b%s"%i
+        Ai, Ap  = "A%s"%i,"A%s"%(i-1)
+        p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi] #Por que no se tuvo que hacer T ??
         p[Ai]   = A_Function(  p[Zi]  )
         print Wi,p[Wi].shape
         print bi,p[bi].shape
         print Ai,p[Ai].shape
         print Zi,p[Zi].shape
-    #Trabajar sobre la capa final
-    i = total_layers+1                      
-    #FORWARD Capa Final - Sigmoidal
-    activacionFinal = activaciones.SIGMOIDAL
-    A_Function    = getAFunction(activacion)    #Funcion para calcular A
-    Zi, Wi, bi    = "Z%s"%i, "W%s"%i,"b%s"%i
-    Ai, Ap  = "A%s"%i,"A%s"%(i-1)
-    p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi] #Por que no se tuvo que hacer T ??
-    p[Ai]   = A_Function(  p[Zi]  )
-    print Wi,p[Wi].shape
-    print bi,p[bi].shape
-    print Ai,p[Ai].shape
-    print Zi,p[Zi].shape
-    # J = getCosto(  )
-    #Backward Capa Final - Sigmoidal
-    dz_Function   = getDZFunction(activacion)
-    dZi, dWi, dbi    = "dZ%s"%i, "dW%s"%i,"db%s"%i
-    p[dZi] = p[Ai] - Y #Checar lo de las Ys y el vector de 10 posiciones
-    p[dWi] = p[dZi].T.dot(p[Ai])
-    p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
-    print dZi,p[dZi].shape
-    print dWi,p[dWi].shape
-    print dbi,p[dbi].shape
-    #Backward demas Capas
-    for i,layer in reverse_enum(hidden_layers_sizes):
-        i += 1
-        activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
+        # J = getCosto(  )
+        #Backward Capa Final - Sigmoidal
         dz_Function   = getDZFunction(activacion)
         dZi, dWi, dbi    = "dZ%s"%i, "dW%s"%i,"db%s"%i
-        dZn, dWn,      = "dZ%s"%(i+1), "dW%s"%(i+1)
-        Zi , Ai = "Z%s"%i,"A%s"%i
-        p[dZi] = p[dWn].dot( p[dZn].T) # * dz_Function( p[Zi] )
-        p[dWi] = p[dZi].T.dot( p[Ai].T )/m
+        p[dZi] = p[Ai] - Y #Checar lo de las Ys y el vector de 10 posiciones
+        p[dWi] = p[dZi].T.dot(p[Ai])
         p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
         print dZi,p[dZi].shape
         print dWi,p[dWi].shape
         print dbi,p[dbi].shape
-    #Ajustar pesos
-
+        #Backward demas Capas
+        for i,layer in reverse_enum(hidden_layers_sizes):
+            i += 1
+            activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
+            dz_Function   = getDZFunction(activacion)
+            dZi, dWi, dbi = "dZ%s"%i, "dW%s"%i,"db%s"%i
+            dZn, dWn      = "dZ%s"%(i+1), "dW%s"%(i+1)
+            Zi , Ai, Wi   = "Z%s"%i,"A%s"%i, "W%s"%i
+            p[dZi] = p[dWn].dot( p[dZn].T) # * g'( p[Zi] ) g' se debe obtener de otra funcion
+            p[dWi] = p[dZi].T.dot( p[Ai].T )/m
+            p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
+            #Ajustar pesos    
+            p[Wi]  = p[Wi] - alpha*p[dWi]
+            p[bi]  = p[bi] - alpha*p[dbi]
+            print dZi,p[dZi].shape
+            print dWi,p[dWi].shape
+            print dbi,p[dbi].shape
+    
 #Para una capa
 #   L_in  seria la size del vector Wi
 #   L_out seria la cantidad de neuronas en la capa, valor maximo de i en Wi
