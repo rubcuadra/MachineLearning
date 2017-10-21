@@ -70,6 +70,15 @@ def funcionCostoLineal(thetas,th0,X, Y):
 def linealGradiante(z):
     return 1
 
+#Devuelve funciones de gradientes
+def getdGFunction(activation):
+    if activation is activaciones.LINEAL:
+        return linealGradiante
+    elif activation is activaciones.SIGMOIDAL:
+        return sigmoidGradiente
+    else:
+        return None
+
 #Las funciones que devuelve son funciones que reciben como parametro:
 #   weights : Vector de 1xn (Numero de variables en un ejemplo)
 #   b       : Numero 
@@ -110,16 +119,17 @@ def getYsAsMatrix(Y,totalLabels):
     return f(Y)
 
 #A debe tener las evaluaciones sigmoidales por neurona
-def getCost(Z,A,Y):
-    # print Z[0]
-    # print A[0]
-    # print Y[0]
-    # np.vectorize(sig)
-    # print sig(Z)
-    # print A
-    #Inicializar outputs
-    #funcionCostoSigmoidal
-    return 1
+def getCost(A,Y): 
+    J = 0
+    m = Y.shape[0]
+    #sx es la evaluacion sigmoidal en cada ejemplo
+    #su Size sera numEjemplosXnumNeuronasSalida
+    for a,y in zip(A.T,Y): #Iterar por cada ejemplo
+        pt = -1*y*np.log(a)
+        pf = (1-y)*np.log(1-a)
+        J += pt-pf  
+    J /= m
+    return np.average(J)
 
 #input_layer_size representa la cantidad de entradas para cada ejemplo, en una imagen de 20x20 tendria un size de 400
 #hidden_layer_size representa la cantidad de neuronas en la capa de enmedio(Deberia ser un vector si queremos N capas)
@@ -175,10 +185,10 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
         # print Zi,p[Zi].shape
 
         #Obtener Costo
-        J = getCost(p[Zi],p[Ai],fixedYs)
-        
+        J = getCost( p[Ai] ,Y)
+        print J
         #Backward Capa Final - Sigmoidal
-        dz_Function   = getDZFunction(activacion)
+        dz_Function   = getDZFunction(activacionFinal)
         dZi, dWi, dbi    = "dZ%s"%i, "dW%s"%i,"db%s"%i
         p[dZi] = p[Ai] - Y #Checar lo de las Ys y el vector de 10 posiciones
         p[dWi] = p[dZi].dot(p[Ap].T)
@@ -192,19 +202,19 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
             i += 1
             activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
             dz_Function   = getDZFunction(activacion)
+            dg_function   = getdGFunction(activacion)
             dZi, dWi, dbi = "dZ%s"%i, "dW%s"%i,"db%s"%i
             dZn, dWn      = "dZ%s"%(i+1), "dW%s"%(i+1)
             Zi , Ap, Wi   = "Z%s"%i,"A%s"%(i-1), "W%s"%i
             bi = "b%s"%i
             Wn = "W%s"%(i+1)
-            p[dZi] = p[Wn].T.dot( p[dZn] ) # * g'( p[Zi] ) g' se debe obtener de otra funcion
+            p[dZi] = p[Wn].T.dot( p[dZn] ) * dg_function(p[Zi])#*g'(Z)
             p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)
             p[dWi] = p[dZi].dot( p[Ap].T )        
             # #Ajustar pesos    
             p[Wi]  = p[Wi] - p[dWi]*alpha/m
             p[bi]  = p[bi] - p[dbi]*alpha/m
             
-    
 #Para una capa
 #   L_in  seria la size del vector Wi
 #   L_out seria la cantidad de neuronas en la capa, valor maximo de i en Wi
@@ -217,4 +227,4 @@ def randInicializacionPesos(L_in,L_out,e=0.12):
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
-    entrenaRN(xExamples,tags,[25],iters=1)
+    entrenaRN(xExamples,tags,[25],iters=10,alpha=0.0001)
