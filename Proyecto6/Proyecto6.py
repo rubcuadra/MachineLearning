@@ -148,7 +148,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers )
     fixedYs          = getYsAsMatrix(Y,num_labels)  
-    #Y = fixedYs
+    # Y                = fixedYs
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
     # print "A0",p["A0"].shape
@@ -174,16 +174,12 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
             Ai, Ap  = "A%s"%(l+1),"A%s"%(l)
             p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi]
             p[Ai]   = A_Function(  p[Zi]  ) 
-            
-        #Obtener Costo
-        J = getCost( p[Ai], Y)
-        print J
         
         #BACK PROPAGATION
         l = total_layers+1 #Capa Final
         dz_Function      = getDZFunction(finalLayer.activacion)
         dZi, dWi, dbi    = "dZ%s"%l, "dW%s"%l,"db%s"%l
-        p[dZi] = dz_Function(p[Ai],Y) #Por esto no se mete al loop
+        p[dZi] = dz_Function(p[Ai],Y) #Con vector este tarda demasiado
         p[dWi] = p[dZi].dot(p[Ap].T)
         p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
 
@@ -201,7 +197,11 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
             p[dWi] = p[dZi].dot( p[Ap].T )        
             # #Ajustar pesos    
             p[Wi]  = p[Wi] - p[dWi]*alpha/m
-            p[bi]  = p[bi] - p[dbi]*alpha/m   
+            p[bi]  = p[bi] - p[dbi]*alpha/m  
+
+        #Obtener Costo
+        J = getCost( p[Ai], Y)
+        print J
     return p #p debe tener todas las Ws
 
 #Para una capa
@@ -223,4 +223,4 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
     layerMedia = NNLayer(25,activaciones.LINEAL)
-    entrenaRN(xExamples,tags,[layerMedia],iters=10,alpha=0.0001)
+    entrenaRN(xExamples,tags,[layerMedia],iters=1,alpha=0.0001)
