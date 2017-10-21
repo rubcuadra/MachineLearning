@@ -6,6 +6,7 @@ import numpy as np
 import math, csv, copy
 from random import random
 from enum import Enum
+import json
 
 #Activacion se toma una del enum
 class activaciones(Enum): #seria lo mejor
@@ -149,7 +150,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers )
     fixedYs          = getYsAsMatrix(Y,num_labels)  
-    Y                = fixedYs
+    #Y                = fixedYs
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
     # print "A0",p["A0"].shape
@@ -220,8 +221,21 @@ def randInicializacionPesos(L_in,L_out,e=0.12):
 def prediceRNYaEntrenada(X,W,b):
     pass
 
+def gen(d):
+    for key,val in d.items():
+        if type(val).__module__!=np.__name__: 
+            yield key,val 
+        yield key,val.tolist()
+
+def dumpDict(fileName,_dict):
+    with open(fileName, 'w') as fp:
+        json.dumps( { key:val for key,val in gen(_dict) } , fp)
+
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
     l  = NNLayer(25,activaciones.LINEAL)
-    entrenaRN(xExamples,tags,[l],iters=1000,alpha=0.0001)
+    p  = entrenaRN(xExamples,tags,[l],iters=1,alpha=0.01)
+    dumpDict("vars.json",p)
+
+    
