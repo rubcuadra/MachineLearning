@@ -35,13 +35,9 @@ def h(vX,thetas):
 #Donde z es el resultado de la hipothesis thetaT*x
 def sig(z):
     return 1.0/(1.0+np.e**(-z))
-
 #X y Y son vectores de misma size
 #Thetas son pesos
 def funcionCostoSigmoidal(thetas,th0,X, Y):
-    if type(thetas).__module__ != np.__name__: thetas = np.array(thetas)
-    if type(X).__module__ != np.__name__: X = np.array(X)
-    if type(Y).__module__ != np.__name__: Y = np.array(Y)
     #Inicializar outputs
     J = 0
     m = len(X) 
@@ -62,10 +58,6 @@ def sigmoidGradiente(z):
 
 #Promedio de los errores al cuadrado
 def funcionCostoLineal(thetas,th0,X, Y):
-    if type(thetas).__module__ != np.__name__: thetas = np.array(thetas)
-    if type(X).__module__ != np.__name__: X = np.array(X)
-    if type(Y).__module__ != np.__name__: Y = np.array(Y)
-    
     error = 0
     m = len(X)
     for i in range(m):
@@ -93,11 +85,12 @@ def getCostFunction(activation):
 
 #Regresa una funcion que recibe como parametro un vector Z y devuelve el vector convertido
 #(usando sigmoidal, escalon,rELU, etc)
-def getAFunction(activation):
+#ACTIVATION FUNCTION ESTA RARO, CHECAR SIGMOIDAL
+def getActivationFunction(activation):
     if activation is activaciones.LINEAL:
         return lambda z: z
     elif activation is activaciones.SIGMOIDAL:
-        return lambda z: sig(z)
+        return lambda z: sig(z) #Que lo haga para cada elemento
     else:
         return None
 
@@ -109,20 +102,24 @@ def getDZFunction(activation):
     else:
         return None
 
-def getCosto(Y): 
-    #k posibles etiqueras 
-    print Y.shape
-    #pt = -1*Y[i] *np.log(sigEval)
-    #pf = (1-Y[i])*np.log(1-sigEval)
-    return 0
+def getYsAsMatrix(Y,totalLabels):
+    #Identidad con todas las etiqueras posibles
+    t = np.identity(totalLabels) 
+    f = np.vectorize(lambda y: t[y], otypes=[np.ndarray])
+    #Poner otypes para que nos deje
+    return f(Y)
 
-def getYsAsMatrix(totalLabels):
-    # m    = []
-    # for i in range(totalLabels):
-    #     t = np.zeros( totalLabels )
-    #     t[i] = 1. #Solo nos dice a que grupo pertenece
-    #     m.append( t )
-    return np.identity(totalLabels)
+#A debe tener las evaluaciones sigmoidales por neurona
+def getCost(Z,A,Y):
+    # print Z[0]
+    # print A[0]
+    # print Y[0]
+    # np.vectorize(sig)
+    # print sig(Z)
+    # print A
+    #Inicializar outputs
+    #funcionCostoSigmoidal
+    return 1
 
 #input_layer_size representa la cantidad de entradas para cada ejemplo, en una imagen de 20x20 tendria un size de 400
 #hidden_layer_size representa la cantidad de neuronas en la capa de enmedio(Deberia ser un vector si queremos N capas)
@@ -133,12 +130,12 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
     input_layer_size = len( X[0] )
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers_sizes )
-    fixedYs          = getYsAsMatrix(num_labels)  
+    fixedYs          = getYsAsMatrix(Y,num_labels)  
+    #Y = fixedYs
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
     # print "A0",p["A0"].shape
     # print "Y" ,Y.shape
-    
     #Generar pesos aleatorios iniciales, pasar a una funcion que nos devuelva el dictionary
     #+[num_labels] donde num_labels es la cantidad de neuronas en la capa final(Categorias para clasificar)
     l_in = input_layer_size
@@ -150,15 +147,15 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
 
     #AQUI EMPIEZA LA ITERACION
     for i in xrange(iters):    
-        #Iterar por cada capa, de momento la getAFunction sera igual entre todas las neuronas de esa capa
+        #Iterar por cada capa, de momento la getActivationFunction sera igual entre todas las neuronas de esa capa
         #FORWARD PROPAGATION
         for i,layer in enumerate(hidden_layers_sizes):
             activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
-            A_Function    = getAFunction(activacion)    #Funcion para calcular A
+            A_Function    = getActivationFunction(activacion)    #Funcion para calcular A
             Zi, Wi, bi    = "Z%s"%(i+1), "W%s"%(i+1), "b%s"%(i+1)
             Ai, Ap  = "A%s"%(i+1),"A%s"%(i)
             p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi]
-            p[Ai]   = A_Function(  p[Zi]  )
+            p[Ai]   = A_Function(  p[Zi]  ) 
             # print Wi,p[Wi].shape
             # print bi,p[bi].shape
             # print Ai,p[Ai].shape
@@ -167,17 +164,18 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
         i = total_layers+1                      
         #FORWARD Capa Final - Sigmoidal
         activacionFinal = activaciones.SIGMOIDAL
-        A_Function    = getAFunction(activacion)    #Funcion para calcular A
+        A_Function    = getActivationFunction(activacion)    #Funcion para calcular A
         Zi, Wi, bi    = "Z%s"%i, "W%s"%i,"b%s"%i
         Ai, Ap  = "A%s"%i,"A%s"%(i-1)
-        p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi] #Por que no se tuvo que hacer T ??
+        p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi] 
         p[Ai]   = A_Function(  p[Zi]  )
         # print Wi,p[Wi].shape
         # print bi,p[bi].shape
         # print Ai,p[Ai].shape
         # print Zi,p[Zi].shape
-        
-        J = getCosto( fixedYs )
+
+        #Obtener Costo
+        J = getCost(p[Zi],p[Ai],fixedYs)
         
         #Backward Capa Final - Sigmoidal
         dz_Function   = getDZFunction(activacion)
