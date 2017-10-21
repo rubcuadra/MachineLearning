@@ -148,7 +148,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers )
     fixedYs          = getYsAsMatrix(Y,num_labels)  
-    # Y                = fixedYs
+    Y                = fixedYs
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
     # print "A0",p["A0"].shape
@@ -222,5 +222,5 @@ def prediceRNYaEntrenada(X,W,b):
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
-    layerMedia = NNLayer(25,activaciones.LINEAL)
-    entrenaRN(xExamples,tags,[layerMedia],iters=1,alpha=0.0001)
+    l  = NNLayer(25,activaciones.LINEAL)
+    entrenaRN(xExamples,tags,[l],iters=1000,alpha=0.0001)
