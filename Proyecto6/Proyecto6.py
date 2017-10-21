@@ -11,6 +11,14 @@ class activaciones(Enum): #seria lo mejor
     LINEAL = "lineal"
     SIGMOIDAL = "sigmoidal"
 
+#Activacion viene del enum
+#size es un numero entero que representa las neuronas en la capa
+class NNLayer(object):
+    def __init__(self,numNeuronas,activacion):
+        super(NNLayer,self).__init__()
+        self.size = numNeuronas
+        self.activacion = activacion
+
 def reverse_enum(L):
     for index in reversed(xrange(len(L))):
         yield index, L[index]
@@ -136,31 +144,33 @@ def getCost(A,Y):
 #num_labels es la cantidad de salidas en la red, cada salida representa un posible grupo al que pertenece el ejemplo, para detectar digitos existen 10 salidas 0-9
 #y el valor de las etiquetas
 #X cada valor posee un ejemplo
-def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
+def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001):
     input_layer_size = len( X[0] )
     num_labels       = len( np.unique(Y) )
-    total_layers     = len( hidden_layers_sizes )
+    total_layers     = len( hidden_layers )
     fixedYs          = getYsAsMatrix(Y,num_labels)  
     #Y = fixedYs
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
     # print "A0",p["A0"].shape
     # print "Y" ,Y.shape
+    finalLayer = NNLayer(num_labels,activaciones.SIGMOIDAL) 
+    
     #Generar pesos aleatorios iniciales, pasar a una funcion que nos devuelva el dictionary
     #+[num_labels] donde num_labels es la cantidad de neuronas en la capa final(Categorias para clasificar)
     l_in = input_layer_size
-    for i,layer_size in enumerate(hidden_layers_sizes+[num_labels]): #Iterar sobre cada capa
+    for i,layer in enumerate(hidden_layers+[finalLayer]): #Iterar sobre cada capa
         i+=1
-        p["W%s"%i] = randInicializacionPesos(l_in,layer_size)
-        p["b%s"%i] = randInicializacionPesos(1,layer_size)   #Obtener solo la b para cada neurona
-        l_in = layer_size   
+        p["W%s"%i] = randInicializacionPesos(l_in,layer.size)
+        p["b%s"%i] = randInicializacionPesos(1,layer.size)   #Obtener solo la b para cada neurona
+        l_in = layer.size #Preparar la size de la capa anterior   
 
     #AQUI EMPIEZA LA ITERACION
     for i in xrange(iters):    
         #Iterar por cada capa, de momento la getActivationFunction sera igual entre todas las neuronas de esa capa
         #FORWARD PROPAGATION
-        for i,layer in enumerate(hidden_layers_sizes):
-            activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
+        for i,layer in enumerate(hidden_layers):
+            activacion    = layer.activacion                     #Obtenerla por cada capa, remplazar el _ del iterador
             A_Function    = getActivationFunction(activacion)    #Funcion para calcular A
             Zi, Wi, bi    = "Z%s"%(i+1), "W%s"%(i+1), "b%s"%(i+1)
             Ai, Ap  = "A%s"%(i+1),"A%s"%(i)
@@ -198,9 +208,9 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
         # print dbi,p[dbi].shape
 
         #Backward demas Capas
-        for i,layer in reverse_enum(hidden_layers_sizes):
+        for i,layer in reverse_enum(hidden_layers):
             i += 1
-            activacion    = activaciones.LINEAL         #Obtenerla por cada capa, remplazar el _ del iterador
+            activacion    = layer.activacion        #Obtenerla por cada capa, remplazar el _ del iterador
             dz_Function   = getDZFunction(activacion)
             dg_function   = getdGFunction(activacion)
             dZi, dWi, dbi = "dZ%s"%i, "dW%s"%i,"db%s"%i
@@ -213,8 +223,9 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
             p[dWi] = p[dZi].dot( p[Ap].T )        
             # #Ajustar pesos    
             p[Wi]  = p[Wi] - p[dWi]*alpha/m
-            p[bi]  = p[bi] - p[dbi]*alpha/m
-            
+            p[bi]  = p[bi] - p[dbi]*alpha/m   
+    return p #p debe tener todas las Ws
+
 #Para una capa
 #   L_in  seria la size del vector Wi
 #   L_out seria la cantidad de neuronas en la capa, valor maximo de i en Wi
@@ -224,7 +235,15 @@ def randInicializacionPesos(L_in,L_out,e=0.12):
         weights.append( np.array( [ -e + 2*e*random() for i in range(L_in)] )  )
     return np.array(weights)
 
+#X son todos los ejemplos
+#W es un vector donde posee W[0] = W0, W[1] = W1...
+#b es un vector donde posee b[0] = b0, b[1] = b1...
+def prediceRNYaEntrenada(X,W,b):
+    pass
+
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
-    entrenaRN(xExamples,tags,[25],iters=10,alpha=0.0001)
+    layerMedia = NNLayer(25,activaciones.LINEAL)
+    entrenaRN(xExamples,tags,[layerMedia],iters=10,alpha=0.0001)
+    print 
