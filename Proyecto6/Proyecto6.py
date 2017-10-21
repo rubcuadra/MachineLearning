@@ -1,5 +1,5 @@
 #Ruben Cuadra A01019102
-import gnumpy as gpu
+#import gnumpy as gpu
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
