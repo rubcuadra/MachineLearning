@@ -90,7 +90,7 @@ def getActivationFunction(activation):
     if activation is activaciones.LINEAL:
         return lambda z: z
     elif activation is activaciones.SIGMOIDAL:
-        return lambda z: sig(z) #Que lo haga para cada elemento
+        return lambda z: sig(z) 
     else:
         return None
 
@@ -164,7 +164,7 @@ def entrenaRN(X,Y,hidden_layers_sizes,iters=1000,alpha=0.001):
         i = total_layers+1                      
         #FORWARD Capa Final - Sigmoidal
         activacionFinal = activaciones.SIGMOIDAL
-        A_Function    = getActivationFunction(activacion)    #Funcion para calcular A
+        A_Function    = getActivationFunction(activacionFinal)    #Funcion para calcular A
         Zi, Wi, bi    = "Z%s"%i, "W%s"%i,"b%s"%i
         Ai, Ap  = "A%s"%i,"A%s"%(i-1)
         p[Zi]   = p[Wi].dot( p[Ap] ) + p[bi] 
