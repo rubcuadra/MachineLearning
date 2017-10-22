@@ -221,21 +221,10 @@ def randInicializacionPesos(L_in,L_out,e=0.12):
 def prediceRNYaEntrenada(X,W,b):
     pass
 
-def gen(d):
-    for key,val in d.items():
-        if type(val).__module__!=np.__name__: 
-            yield key,val 
-        yield key,val.tolist()
-
-def dumpDict(fileName,_dict):
-    with open(fileName, 'w') as fp:
-        json.dumps( { key:val for key,val in gen(_dict) } , fp)
-
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
     l  = NNLayer(25,activaciones.LINEAL)
     p  = entrenaRN(xExamples,tags,[l],iters=1,alpha=0.01)
-    dumpDict("vars.json",p)
-
-    
+    np.save('network.npy',p) 
+    #p = np.load('network.npy').item()
