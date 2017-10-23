@@ -208,6 +208,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=a
         J = getCost( p[Ai], Y) #TODO cambiar a fixedYs
         if J < e: diverged=True
         print J
+    p["l"] = len(layers) #Necesario para la prediccion
     return p #maybe sacar todas las dZ,dW,db del dict
 
 #Para una capa
@@ -223,16 +224,33 @@ def randInicializacionPesos(L_in,L_out,e=0.12):
 #W es un vector donde posee W[0] = W0, W[1] = W1...
 #b es un vector donde posee b[0] = b0, b[1] = b1...
 def prediceRNYaEntrenada(X,W,b):
-    pass
+    print X.shape
+    print len(W)
+    print len(b)
 
 def getWeightsFromFile(filename):
     d = np.load(filename).item() #dict de la red entrenada
+    l = d["l"] #Numero de capas
 
+    #Inicializar retornos
+    W = [None]*l
+    b = [None]*l
+
+    for key in d:
+        #Validar las primeras letas
+        #-1 necesario por que las capas empiezan en 1
+        if key[0]   is "W": 
+            i    = int( key[1:] ) -1
+            W[i] = d[key]
+        elif key[0] is "b":
+            i    = int( key[1:] ) -1
+            b[i] = d[key]
+
+    return W, b
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print "X", xExamples.shape
     print "Y", tags.shape
-
     entrenar = False
     if entrenar:
         l  = NNLayer(25,activaciones.LINEAL)
@@ -240,6 +258,4 @@ if __name__ == '__main__':
         np.save('network.npy',p) 
     else:
         W,b = getWeightsFromFile("network.npy")
-        Y_  = prediceRNYaEntrenada(xExamples,W,b)
-        for key in p:
-            print key
+        _Y  = prediceRNYaEntrenada(xExamples,W,b)
