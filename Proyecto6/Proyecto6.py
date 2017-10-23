@@ -146,7 +146,7 @@ def getCost(A,Y):
 #num_labels es la cantidad de salidas en la red, cada salida representa un posible grupo al que pertenece el ejemplo, para detectar digitos existen 10 salidas 0-9
 #y el valor de las etiquetas
 #X cada valor posee un ejemplo
-def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activaciones.SIGMOIDAL):
+def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=activaciones.SIGMOIDAL):
     input_layer_size = len( X[0] )
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers )
@@ -154,6 +154,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
     Y                = fixedYs
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
+    diverged         = False
     # print "A0",p["A0"].shape
     # print "Y" ,Y.shape
     finalLayer = NNLayer(num_labels,activacionFinal) 
@@ -168,7 +169,8 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
         l_in = layer.size #Preparar la size de la capa anterior   
 
     #AQUI EMPIEZA LA ITERACION
-    for i in xrange(iters):    
+    while (not diverged) and (iters>0):
+        iters-=1
         #Iterar por cada capa, de momento la getActivationFunction sera igual entre todas las neuronas de esa capa
         #FORWARD PROPAGATION
         for l,layer in enumerate(layers):
@@ -204,8 +206,9 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
             p[bi]  = p[bi] - p[dbi]*alpha/m  
         #Obtener Costo
         J = getCost( p[Ai], Y) #TODO cambiar a fixedYs
+        if J < e: diverged=True
         print J
-    return p #p debe tener todas las Ws
+    return p #maybe sacar todas las dZ,dW,db del dict
 
 #Para una capa
 #   L_in  seria la size del vector Wi
@@ -222,10 +225,21 @@ def randInicializacionPesos(L_in,L_out,e=0.12):
 def prediceRNYaEntrenada(X,W,b):
     pass
 
+def getWeightsFromFile(filename):
+    d = np.load(filename).item() #dict de la red entrenada
+
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
-    #print xExamples,tags
-    l  = NNLayer(25,activaciones.LINEAL)
-    p  = entrenaRN(xExamples,tags,[l],iters=1,alpha=0.01)
-    np.save('network.npy',p) 
-    #p = np.load('network.npy').item()
+    print "X", xExamples.shape
+    print "Y", tags.shape
+
+    entrenar = False
+    if entrenar:
+        l  = NNLayer(25,activaciones.LINEAL)
+        p  = entrenaRN(xExamples,tags,[l],iters=1000,alpha=0.5)
+        np.save('network.npy',p) 
+    else:
+        W,b = getWeightsFromFile("network.npy")
+        Y_  = prediceRNYaEntrenada(xExamples,W,b)
+        for key in p:
+            print key
