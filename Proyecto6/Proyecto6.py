@@ -131,7 +131,7 @@ def getYsAsMatrix(Y,totalLabels):
 def getCost(A,Y): 
     J = 0
     m = Y.shape[0]
-    #sx es la evaluacion sigmoidal en cada ejemplo
+    #a es la evaluacion sigmoidal para cada ejemplo
     #su Size sera numEjemplosXnumNeuronasSalida
     for a,y in zip(A.T,Y): #Iterar por cada ejemplo
         pt = -1*y*np.log(a)
@@ -182,6 +182,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
         dz_Function      = getDZFunction(finalLayer.activacion)
         dZi, dWi, dbi    = "dZ%s"%l, "dW%s"%l,"db%s"%l
         p[dZi] = dz_Function(p[Ai],Y) #Con vector este tarda demasiado
+        #TODO ver si la operacion dz se hace en tarjeta grafica o que hacemos
         p[dWi] = p[dZi].dot(p[Ap].T)
         p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
 
@@ -200,9 +201,8 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
             # #Ajustar pesos    
             p[Wi]  = p[Wi] - p[dWi]*alpha/m
             p[bi]  = p[bi] - p[dbi]*alpha/m  
-
         #Obtener Costo
-        J = getCost( p[Ai], Y)
+        J = getCost( p[Ai], Y) #TODO cambiar a fixedYs
         print J
     return p #p debe tener todas las Ws
 
@@ -225,6 +225,6 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
     l  = NNLayer(25,activaciones.LINEAL)
-    p  = entrenaRN(xExamples,tags,[l],iters=1,alpha=0.01)
+    p  = entrenaRN(xExamples,tags,[l],iters=10,alpha=0.01)
     np.save('network.npy',p) 
     #p = np.load('network.npy').item()
