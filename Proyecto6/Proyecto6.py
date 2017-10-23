@@ -151,7 +151,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers )
     fixedYs          = getYsAsMatrix(Y,num_labels)  
-    #Y                = fixedYs
+    Y                = fixedYs
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
     # print "A0",p["A0"].shape
@@ -182,9 +182,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
         l = total_layers+1 #Capa Final
         dz_Function      = getDZFunction(finalLayer.activacion)
         dZi, dWi, dbi    = "dZ%s"%l, "dW%s"%l,"db%s"%l
-        p[dZi] = dz_Function(p[Ai],Y) #Con vector este tarda demasiado
-        # print Ai, p[Ai].shape
-        # print "Y", fixedYs.shape
+        p[dZi] = dz_Function(p[Ai], Y.T) #Con vector este tarda demasiado
         #TODO ver si la operacion dz se hace en tarjeta grafica o que hacemos
         p[dWi] = p[dZi].dot(p[Ap].T)
         p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
