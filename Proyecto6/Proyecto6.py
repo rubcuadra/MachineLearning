@@ -224,9 +224,19 @@ def randInicializacionPesos(L_in,L_out,e=0.12):
 #W es un vector donde posee W[0] = W0, W[1] = W1...
 #b es un vector donde posee b[0] = b0, b[1] = b1...
 def prediceRNYaEntrenada(X,W,b):
-    print X.shape
-    print len(W)
-    print len(b)
+    #Convertir de shape (n,) -> (n,1)
+    if len(X.shape) < 2: X = X[:,np.newaxis].T
+    #De momento todas seran activaciones normales y la ultima sigmoidal
+    Ap = X.T
+    for i,(Wi,bi) in enumerate(zip(W,b)):   
+        Zi  = Wi.dot(Ap) + bi
+        Ap  = Zi #Aqui se debe aplicar la funcion por capa, al ser lineal es igual    
+    Ai = sig(Ap)
+    #Obtener el index del elemento mas grande por cada row en Ai
+    r = np.argmax(Ai, axis=0) #Cada indice representa el digito reconocido
+    #No es necesario parsear el valor maximo
+    return r
+
 
 def getWeightsFromFile(filename):
     d = np.load(filename).item() #dict de la red entrenada
@@ -245,8 +255,19 @@ def getWeightsFromFile(filename):
         elif key[0] is "b":
             i    = int( key[1:] ) -1
             b[i] = d[key]
-
     return W, b
+
+#Y son los valores reales de los datos
+#_Y es una prediccion
+#Nos devuelve el % de error entre ambos arreglos
+def getErrorPercentage(Y,_Y):
+    e,t = 0.,len(_Y)
+    for  (_y,y) in zip(_Y,tags):
+        if _y != y:
+            e+=1
+    print "%s errores de %s"%(e,t)
+    return e/t
+
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print "X", xExamples.shape
@@ -258,4 +279,8 @@ if __name__ == '__main__':
         np.save('network.npy',p) 
     else:
         W,b = getWeightsFromFile("network.npy")
-        _Y  = prediceRNYaEntrenada(xExamples,W,b)
+        num,tag = xExamples[0],tags[0]
+        _Y  = prediceRNYaEntrenada(num,W,b)
+        print getErrorPercentage(tag,_Y)
+
+
