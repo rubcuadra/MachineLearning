@@ -123,9 +123,10 @@ def getDZFunction(activation):
 def getYsAsMatrix(Y,totalLabels):
     #Identidad con todas las etiqueras posibles
     t = np.identity(totalLabels) 
-    f = np.vectorize(lambda y: t[y], otypes=[np.ndarray])
     #Poner otypes para que nos deje
-    return f(Y)
+    f = np.vectorize(lambda y: t[y], otypes=[np.ndarray])
+    #np.vstack nos convierte de un vector de vectores a una np matrix
+    return np.vstack( f(Y) ) #f(Y) convierte los valores en vectores
 
 #A debe tener las evaluaciones sigmoidales por neurona
 def getCost(A,Y): 
@@ -182,6 +183,8 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,alpha=0.001,activacionFinal=activacio
         dz_Function      = getDZFunction(finalLayer.activacion)
         dZi, dWi, dbi    = "dZ%s"%l, "dW%s"%l,"db%s"%l
         p[dZi] = dz_Function(p[Ai],Y) #Con vector este tarda demasiado
+        # print Ai, p[Ai].shape
+        # print "Y", fixedYs.shape
         #TODO ver si la operacion dz se hace en tarjeta grafica o que hacemos
         p[dWi] = p[dZi].dot(p[Ap].T)
         p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
@@ -225,6 +228,6 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     #print xExamples,tags
     l  = NNLayer(25,activaciones.LINEAL)
-    p  = entrenaRN(xExamples,tags,[l],iters=10,alpha=0.01)
+    p  = entrenaRN(xExamples,tags,[l],iters=1,alpha=0.01)
     np.save('network.npy',p) 
     #p = np.load('network.npy').item()
