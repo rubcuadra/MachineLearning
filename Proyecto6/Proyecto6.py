@@ -7,6 +7,7 @@ import numpy as np
 import math, csv, copy
 from random import random
 from enum import Enum
+from Tkinter import *
 import json
 
 #Activacion se toma una del enum
@@ -271,18 +272,18 @@ def getWeightsFromFile(filename):
 #Nos devuelve el % de error entre ambos arreglos
 def getErrorPercentage(Y,_Y):
     e,t = 0.,len(_Y)
-    for  (_y,y) in zip(_Y,tags):
+    for  (_y,y) in zip(_Y,Y):
         if _y != y:
             e+=1
-    # print "%s errores de %s"%(e,t)
+    #print "%s errores de %s"%(e,t)
     return (e/t)
 
 def graficarNumero( num ):
     s = num.shape[0]**0.5 #Solo graficara numeros de dimensiones width = height
     f = np.vectorize( lambda val: (val+1)/2 ) #Del campo [-1,1] -> [0,1]
-    num = f(num)   #Convertir al campo de 0 a 1
-    img = num.reshape( (s,s) )
-    plt.imshow(img.T, interpolation='nearest', cmap='gray')
+    num = f(num)                              #Convertir al campo de 0 a 1
+    img = num.reshape( (s,s) )                
+    plt.imshow(img.T, interpolation='nearest', cmap='gray') #Escala de grises de 0 a 1
     plt.show()
 
 if __name__ == '__main__':
@@ -301,8 +302,10 @@ if __name__ == '__main__':
         print "%s%% de exito"%(100-error*100)
 
         #Graficar algo
-        # example = 3854 #Menor a 5000
-        # x,tag = xExamples[example],tags[example]
-        # graficarNumero( x )
-        
-
+        example = 34 #Menor a 5000
+        x,tag = xExamples[example],[tags[example]] #tag debe ser un array
+        _Y  = prediceRNYaEntrenada(x,W,b)          #_Y es un array
+        error = getErrorPercentage(tag,_Y)         #Recibe 2 arrays
+        print "Prediccion: %s"%_Y
+        print "Etiqueta  : %s"%tag
+        graficarNumero( x )
