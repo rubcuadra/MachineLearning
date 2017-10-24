@@ -242,7 +242,6 @@ def prediceRNYaEntrenada(X,W,b):
 
 def getWeightsFromFile(filename):
     d = np.load(filename).item() #dict de la red entrenada
-    print d
     l = d["l"] #Numero de capas
 
     #Inicializar retornos
@@ -283,10 +282,10 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print "X", xExamples.shape
     print "Y", tags.shape
-    entrenar = False
+    entrenar = True
     if entrenar:
         l  = NNLayer(25,activaciones.LINEAL)
-        p  = entrenaRN(xExamples,tags,[l],iters=10000,alpha=0.5,e=0.04)
+        p  = entrenaRN(xExamples,tags,[l],iters=1000,alpha=1.5,e=0.04)
         np.save('network.npy',p) 
     else:
         W,b = getWeightsFromFile("network0_07.npy")
