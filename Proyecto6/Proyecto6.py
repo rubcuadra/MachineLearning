@@ -155,7 +155,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=a
     Y                = fixedYs
     p                = {"A0":X.T} #Para iterar despues
     m                = p["A0"].shape[1]
-    diverged         = False
+    converged        = False
     # print "A0",p["A0"].shape
     # print "Y" ,Y.shape
     finalLayer = NNLayer(num_labels,activacionFinal) 
@@ -170,7 +170,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=a
         l_in = layer.size #Preparar la size de la capa anterior   
     pJ = float("-inf")
     #AQUI EMPIEZA LA ITERACION
-    while (not diverged) and (iters>0):
+    while (not converged) and (iters>0):
         iters-=1
         #Iterar por cada capa, de momento la getActivationFunction sera igual entre todas las neuronas de esa capa
         #FORWARD PROPAGATION
@@ -212,10 +212,11 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=a
 
         #Obtener Costo
         J = getCost( p[Ai], Y) 
-        if J < e: diverged=True
-        if J > pJ: alpha*=0.9
-        pJ = J
-        print J
+        if J < e: converged=True
+        #Fix divergencia
+        if J > pJ: alpha*=0.9 
+        pJ = J                
+        #print J
     p["l"] = len(layers) #Necesario para la prediccion, numero de capas totales
     return p #maybe sacar todas las dZ del dict
 
@@ -290,8 +291,8 @@ if __name__ == '__main__':
     print "Y", tags.shape
     entrenar = False
     if entrenar:
-        l  = NNLayer(25,activaciones.LINEAL)
-        p  = entrenaRN(xExamples,tags,[l],iters=20000,alpha=0.25,e=0.04)
+        l   = NNLayer(25,activaciones.LINEAL)
+        p   = entrenaRN(xExamples,tags,[l],iters=20000,alpha=0.2,e=0.04)
         np.save('network.npy',p) 
     else:
         W,b = getWeightsFromFile("network038.npy")
