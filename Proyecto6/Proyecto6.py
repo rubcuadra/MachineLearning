@@ -185,33 +185,37 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=a
         l = total_layers+1 #Capa Final
         dz_Function      = getDZFunction(finalLayer.activacion)
         dZi, dWi, dbi    = "dZ%s"%l, "dW%s"%l,"db%s"%l
+        Wi,bi            = "W%s"%l,"b%s"%l
+        Ai, Ap           = "A%s"%l,"A%s"%(l-1)
         p[dZi] = dz_Function(p[Ai], Y.T) #Con vector este tarda demasiado
-        #TODO ver si la operacion dz se hace en tarjeta grafica o que hacemos
-        p[dWi] = p[dZi].dot(p[Ap].T)
-        p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)/m
+        
+        #ESTO SE MODIFICO, CHECAR QUE SHOW
+        dWi = p[dZi].dot(p[Ap].T)
+        dbi = np.sum(p[dZi],axis=1,keepdims=True)/m
+        p[Wi]  = p[Wi] - dWi*alpha/m
+        p[bi]  = p[bi] - dbi*alpha/m  
 
         for l,layer in reverse_enum(hidden_layers): #DEMAS CAPAS
             l += 1
             activacion    = layer.activacion 
             dz_Function   = getDZFunction(activacion)
             dg_function   = getdGFunction(activacion)
-            dZi, dWi, dbi = "dZ%s"%l, "dW%s"%l,"db%s"%l
-            dZn, dWn, Wn  = "dZ%s"%(l+1), "dW%s"%(l+1), "W%s"%(l+1)
+            dZi,dZn, Wn   = "dZ%s"%l,"dZ%s"%(l+1), "W%s"%(l+1)
             Zi , bi, Wi   = "Z%s"%l,"b%s"%l, "W%s"%l
             Ap            = "A%s"%(l-1)
             p[dZi] = p[Wn].T.dot( p[dZn] ) * dg_function(p[Zi])#*g'(Z)
-            p[dbi] = np.sum(p[dZi],axis=1,keepdims=True)
-            p[dWi] = p[dZi].dot( p[Ap].T )        
-            # #Ajustar pesos    
-            p[Wi]  = p[Wi] - p[dWi]*alpha/m
-            p[bi]  = p[bi] - p[dbi]*alpha/m  
+            dbi    = np.sum(p[dZi],axis=1,keepdims=True)
+            dWi    = p[dZi].dot( p[Ap].T )        
+            #Ajustar pesos    
+            p[Wi]  = p[Wi] - dWi*alpha/m
+            p[bi]  = p[bi] - dbi*alpha/m  
+
         #Obtener Costo
-        J = getCost( p[Ai], Y) #TODO cambiar a fixedYs
+        J = getCost( p[Ai], Y) 
         if J < e: diverged=True
         print J
-
-    p["l"] = len(layers) #Necesario para la prediccion
-    return p #maybe sacar todas las dZ,dW,db del dict
+    p["l"] = len(layers) #Necesario para la prediccion, numero de capas totales
+    return p #maybe sacar todas las dZ del dict
 
 #Para una capa
 #   L_in  seria la size del vector Wi
@@ -282,13 +286,13 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print "X", xExamples.shape
     print "Y", tags.shape
-    entrenar = True
+    entrenar = False
     if entrenar:
         l  = NNLayer(25,activaciones.LINEAL)
-        p  = entrenaRN(xExamples,tags,[l],iters=1000,alpha=1.5,e=0.04)
+        p  = entrenaRN(xExamples,tags,[l],iters=1000,alpha=0.08,e=0.04)
         np.save('network.npy',p) 
     else:
-        W,b = getWeightsFromFile("network0_07.npy")
+        W,b = getWeightsFromFile("network065.npy")
         _Y  = prediceRNYaEntrenada(xExamples,W,b)
         error = getErrorPercentage(tags,_Y)
         print "%s%% de exito"%(100-error*100)
