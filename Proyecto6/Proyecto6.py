@@ -242,6 +242,7 @@ def prediceRNYaEntrenada(X,W,b):
 
 def getWeightsFromFile(filename):
     d = np.load(filename).item() #dict de la red entrenada
+    print d
     l = d["l"] #Numero de capas
 
     #Inicializar retornos
@@ -292,7 +293,7 @@ if __name__ == '__main__':
         _Y  = prediceRNYaEntrenada(xExamples,W,b)
         error = getErrorPercentage(tags,_Y)
         print "%s%% de exito"%(100-error*100)
-        
+
         #Graficar algo
         # example = 3854 #Menor a 5000
         # x,tag = xExamples[example],tags[example]
