@@ -289,10 +289,10 @@ if __name__ == '__main__':
     entrenar = False
     if entrenar:
         l  = NNLayer(25,activaciones.LINEAL)
-        p  = entrenaRN(xExamples,tags,[l],iters=1000,alpha=0.08,e=0.04)
+        p  = entrenaRN(xExamples,tags,[l],iters=1000,alpha=0.2,e=0.04)
         np.save('network.npy',p) 
     else:
-        W,b = getWeightsFromFile("network065.npy")
+        W,b = getWeightsFromFile("network055.npy")
         _Y  = prediceRNYaEntrenada(xExamples,W,b)
         error = getErrorPercentage(tags,_Y)
         print "%s%% de exito"%(100-error*100)
