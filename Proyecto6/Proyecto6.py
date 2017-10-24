@@ -7,7 +7,6 @@ import numpy as np
 import math, csv, copy
 from random import random
 from enum import Enum
-from Tkinter import *
 import json
 
 #Activacion se toma una del enum
