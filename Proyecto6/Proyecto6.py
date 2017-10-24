@@ -1,6 +1,7 @@
 #Ruben Cuadra A01019102
 #import gnumpy as gpu
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import matplotlib.patches as mpatches
 import numpy as np
 import math, csv, copy
@@ -208,6 +209,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=a
         J = getCost( p[Ai], Y) #TODO cambiar a fixedYs
         if J < e: diverged=True
         print J
+
     p["l"] = len(layers) #Necesario para la prediccion
     return p #maybe sacar todas las dZ,dW,db del dict
 
@@ -265,22 +267,35 @@ def getErrorPercentage(Y,_Y):
     for  (_y,y) in zip(_Y,tags):
         if _y != y:
             e+=1
-    print "%s errores de %s"%(e,t)
-    return e/t
+    # print "%s errores de %s"%(e,t)
+    return (e/t)
+
+def graficarNumero( num ):
+    s = num.shape[0]**0.5 #Solo graficara numeros de dimensiones width = height
+    f = np.vectorize( lambda val: (val+1)/2 ) #Del campo [-1,1] -> [0,1]
+    num = f(num)   #Convertir al campo de 0 a 1
+    img = num.reshape( (s,s) )
+    plt.imshow(img.T, interpolation='nearest', cmap='gray')
+    plt.show()
 
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print "X", xExamples.shape
     print "Y", tags.shape
-    entrenar = True
+    entrenar = False
     if entrenar:
         l  = NNLayer(25,activaciones.LINEAL)
-        p  = entrenaRN(xExamples,tags,[l],iters=100000,alpha=1,e=0.01)
+        p  = entrenaRN(xExamples,tags,[l],iters=10000,alpha=0.5,e=0.04)
         np.save('network.npy',p) 
     else:
-        W,b = getWeightsFromFile("network.npy")
-        num,tag = xExamples[0],tags[0]
-        _Y  = prediceRNYaEntrenada(num,W,b)
-        print getErrorPercentage(tag,_Y)
-
+        W,b = getWeightsFromFile("network0_07.npy")
+        _Y  = prediceRNYaEntrenada(xExamples,W,b)
+        error = getErrorPercentage(tags,_Y)
+        print "%s%% de exito"%(100-error*100)
+        
+        #Graficar algo
+        # example = 3854 #Menor a 5000
+        # x,tag = xExamples[example],tags[example]
+        # graficarNumero( x )
+        
 
