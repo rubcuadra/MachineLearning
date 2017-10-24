@@ -216,7 +216,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=a
         #Fix divergencia
         if J > pJ: alpha*=0.9 
         pJ = J                
-        #print J
+        # print J
     p["l"] = len(layers) #Necesario para la prediccion, numero de capas totales
     return p #maybe sacar todas las dZ del dict
 
@@ -289,10 +289,10 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print "X", xExamples.shape
     print "Y", tags.shape
-    entrenar = False
+    entrenar = True
     if entrenar:
         l   = NNLayer(25,activaciones.LINEAL)
-        p   = entrenaRN(xExamples,tags,[l],iters=20000,alpha=0.2,e=0.04)
+        p   = entrenaRN(xExamples,tags,[l],iters=35000,alpha=0.2,e=0.04)
         np.save('network.npy',p) 
     else:
         W,b = getWeightsFromFile("network038.npy")
