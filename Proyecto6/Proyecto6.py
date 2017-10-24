@@ -272,10 +272,10 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print "X", xExamples.shape
     print "Y", tags.shape
-    entrenar = False
+    entrenar = True
     if entrenar:
         l  = NNLayer(25,activaciones.LINEAL)
-        p  = entrenaRN(xExamples,tags,[l],iters=1000,alpha=0.5)
+        p  = entrenaRN(xExamples,tags,[l],iters=100000,alpha=1,e=0.01)
         np.save('network.npy',p) 
     else:
         W,b = getWeightsFromFile("network.npy")
