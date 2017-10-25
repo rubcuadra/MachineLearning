@@ -147,7 +147,7 @@ def getCost(A,Y):
 #num_labels es la cantidad de salidas en la red, cada salida representa un posible grupo al que pertenece el ejemplo, para detectar digitos existen 10 salidas 0-9
 #y el valor de las etiquetas
 #X cada valor posee un ejemplo
-def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=activaciones.SIGMOIDAL):
+def entrenaRN(X,Y,hidden_layers=[],iters=1000,e=0.001,alpha=0.001,activacionFinal=activaciones.SIGMOIDAL):
     input_layer_size = len( X[0] )
     num_labels       = len( np.unique(Y) )
     total_layers     = len( hidden_layers )
@@ -216,7 +216,7 @@ def entrenaRN(X,Y,hidden_layers,iters=1000,e=0.001,alpha=0.001,activacionFinal=a
         #Fix divergencia
         if J > pJ: alpha*=0.9 
         pJ = J                
-        # print J
+        print J
     p["l"] = len(layers) #Necesario para la prediccion, numero de capas totales
     return p #maybe sacar todas las dZ del dict
 
@@ -291,8 +291,8 @@ if __name__ == '__main__':
     print "Y", tags.shape
     entrenar = True
     if entrenar:
-        l   = NNLayer(25,activaciones.LINEAL)
-        p   = entrenaRN(xExamples,tags,[l],iters=35000,alpha=0.2,e=0.04)
+        l   = [ NNLayer(25,activaciones.LINEAL) ]
+        p   = entrenaRN(xExamples,tags,l,iters=30000,alpha=0.15,e=0.02)
         np.save('network.npy',p) 
     else:
         W,b = getWeightsFromFile("network038.npy")
