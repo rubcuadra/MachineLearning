@@ -289,7 +289,7 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print "X", xExamples.shape
     print "Y", tags.shape
-    entrenar = True
+    entrenar = False
     if entrenar:
         l   = [ NNLayer(25,activaciones.LINEAL) ]
         p   = entrenaRN(xExamples,tags,l,iters=30000,alpha=0.15,e=0.02)
@@ -299,9 +299,8 @@ if __name__ == '__main__':
         _Y  = prediceRNYaEntrenada(xExamples,W,b)
         error = getErrorPercentage(tags,_Y)
         print "%s%% de exito"%(100-error*100)
-
         #Graficar algo
-        example = 34 #Menor a 5000
+        example = 3014 #Menor a 5000
         x,tag = xExamples[example],[tags[example]] #tag debe ser un array
         _Y  = prediceRNYaEntrenada(x,W,b)          #_Y es un array
         error = getErrorPercentage(tag,_Y)         #Recibe 2 arrays
