@@ -216,7 +216,7 @@ def entrenaRN(X,Y,hidden_layers=[],iters=1000,e=0.001,alpha=0.001,activacionFina
         #Fix divergencia
         if J > pJ: alpha*=0.9 
         pJ = J                
-        print J
+        print (J)
     p["l"] = len(layers) #Necesario para la prediccion, numero de capas totales
     return p #maybe sacar todas las dZ del dict
 
@@ -287,23 +287,23 @@ def graficarNumero( num ):
 
 if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
-    print "X", xExamples.shape
-    print "Y", tags.shape
+    print ("X", xExamples.shape)
+    print ("Y", tags.shape)
     entrenar = False
     if entrenar:
         l   = [ NNLayer(25,activaciones.LINEAL) ]
         p   = entrenaRN(xExamples,tags,l,iters=30000,alpha=0.15,e=0.02)
         np.save('network.npy',p) 
     else:
-        W,b = getWeightsFromFile("network038.npy")
+        W,b = getWeightsFromFile("network038_27.npy")
         _Y  = prediceRNYaEntrenada(xExamples,W,b)
         error = getErrorPercentage(tags,_Y)
-        print "%s%% de exito"%(100-error*100)
+        print ("%s%% de exito"%(100-error*100))
         #Graficar algo
         example = 3014 #Menor a 5000
         x,tag = xExamples[example],[tags[example]] #tag debe ser un array
         _Y  = prediceRNYaEntrenada(x,W,b)          #_Y es un array
         error = getErrorPercentage(tag,_Y)         #Recibe 2 arrays
-        print "Prediccion: %s"%_Y
-        print "Etiqueta  : %s"%tag
+        print ("Prediccion: %s"%_Y)
+        print ("Etiqueta  : %s"%tag)
         graficarNumero( x )
