@@ -23,7 +23,7 @@ class NNLayer(object):
         self.activacion = activacion
 
 def reverse_enum(L):
-    for index in reversed(xrange(len(L))):
+    for index in reversed(range(len(L))):
         yield index, L[index]
 
 #El formato es archivos donde cada linea contiene multiples numeros (entre -1 y 1) separados por un espacio, el ultimo numero representa una etiqueta para esos valores
