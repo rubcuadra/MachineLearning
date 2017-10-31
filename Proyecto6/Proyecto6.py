@@ -298,7 +298,7 @@ if __name__ == '__main__':
         if (sys.version_info > (3, 0)): #No podmeos darle load a un file de otra version
             W,b = getWeightsFromFile("network038_36.npy")
         else:
-            W,b = getWeightsFromFile("network038_27.npy")
+            W,b = getWeightsFromFile("network038_27.npy") #Tiene mejor prediccion
         _Y  = prediceRNYaEntrenada(xExamples,W,b)
         error = getErrorPercentage(tags,_Y)
         print ("%s%% de exito"%(100-error*100))
