@@ -7,7 +7,7 @@ import numpy as np
 import math, csv, copy
 from random import random
 from enum import Enum
-import json
+import json, sys
 
 #Activacion se toma una del enum
 class activaciones(Enum): #seria lo mejor
@@ -278,7 +278,7 @@ def getErrorPercentage(Y,_Y):
     return (e/t)
 
 def graficarNumero( num ):
-    s = num.shape[0]**0.5 #Solo graficara numeros de dimensiones width = height
+    s = int(num.shape[0]**0.5) #Solo graficara numeros de dimensiones width = height
     f = np.vectorize( lambda val: (val+1)/2 ) #Del campo [-1,1] -> [0,1]
     num = f(num)                              #Convertir al campo de 0 a 1
     img = num.reshape( (s,s) )                
@@ -289,13 +289,16 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print ("X", xExamples.shape)
     print ("Y", tags.shape)
-    entrenar = True
+    entrenar = False
     if entrenar:
         l   = [ NNLayer(25,activaciones.LINEAL) ]
-        p   = entrenaRN(xExamples,tags,l,iters=30000,alpha=0.15,e=0.02)
+        p   = entrenaRN(xExamples,tags,l,iters=30000,alpha=0.15,e=0.039)
         np.save('network.npy',p) 
     else:
-        W,b = getWeightsFromFile("network038_27.npy")
+        if (sys.version_info > (3, 0)): #No podmeos darle load a un file de otra version
+            W,b = getWeightsFromFile("network038_36.npy")
+        else:
+            W,b = getWeightsFromFile("network038_27.npy")
         _Y  = prediceRNYaEntrenada(xExamples,W,b)
         error = getErrorPercentage(tags,_Y)
         print ("%s%% de exito"%(100-error*100))
