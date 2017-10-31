@@ -125,7 +125,7 @@ def getYsAsMatrix(Y,totalLabels):
     #Identidad con todas las etiqueras posibles
     t = np.identity(totalLabels) 
     #Poner otypes para que nos deje
-    f = np.vectorize(lambda y: t[y], otypes=[np.ndarray])
+    f = np.vectorize(lambda y: t[int(y)], otypes=[np.ndarray])
     #np.vstack nos convierte de un vector de vectores a una np matrix
     return np.vstack( f(Y) ) #f(Y) convierte los valores en vectores
 
@@ -289,7 +289,7 @@ if __name__ == '__main__':
     xExamples,tags = getDataFromFile("digitos.txt")
     print ("X", xExamples.shape)
     print ("Y", tags.shape)
-    entrenar = False
+    entrenar = True
     if entrenar:
         l   = [ NNLayer(25,activaciones.LINEAL) ]
         p   = entrenaRN(xExamples,tags,l,iters=30000,alpha=0.15,e=0.02)
