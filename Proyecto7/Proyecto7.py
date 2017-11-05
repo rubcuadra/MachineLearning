@@ -18,19 +18,18 @@ def getDataFromFile(filename,delimiter=" "):
     return np.array(vals)
 
 def graficarDatos(data,centroids_history):
-    for val in data:
-        plt.scatter(*val)
-    
     k = len(centroids_history[0]) #Numero centroides
     h = len(centroids_history)    #Cantidad de iteraciones
 
-    for i in range(k): #Iterar por cada centroide    
-        plt.plot( *np.array( [centroids_history[j][i] for j in range(h)] ).T ) #Linea que une puntos
+    for val in data:   #Graficar los datos en negro
+        plt.scatter(*val, color="black")
+
+    for i in range(k): #Graficar linea que une historial de centroides
+        plt.plot( *np.array( [centroids_history[j][i] for j in range(h)] ).T ,color="blue" ) 
 
     for chistory in centroids_history:
-        for centroid in chistory: #Color de los puntos
-            plt.scatter(*centroid,marker="x")
-        
+        for centroid in chistory: #Poner X en centroides segun el historial
+            plt.scatter(*centroid,marker="x",color="red")
     plt.show()
 
 #Datos X
@@ -98,7 +97,7 @@ def runkMeans(X,centroids, max_iters, plot=False):
 
 if __name__ == '__main__':
     data = getDataFromFile("ex7data2.txt")
-    k,iters = 3,1
+    k,iters = 3,10
     # centroids = kMeansInitCentroids(data,k,choice=False) # 3 clusters
     centroids = np.array([[3,3],[6,2],[8,5]]) # 3 clusters
     centroids = runkMeans(data,centroids,iters,plot=True)
