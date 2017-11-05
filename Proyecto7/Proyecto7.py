@@ -17,12 +17,20 @@ def getDataFromFile(filename,delimiter=" "):
             vals.append( [float(v) for v in line] )
     return np.array(vals)
 
-def graficarDatos(data,centroids):
+def graficarDatos(data,centroids_history):
     for val in data:
         plt.scatter(*val)
     
-    for c in centroids:
-        plt.scatter(*c,marker="x",color="red")
+    k = len(centroids_history[0]) #Numero centroides
+    h = len(centroids_history)    #Cantidad de iteraciones
+
+    for i in range(k): #Iterar por cada centroide    
+        plt.plot( *np.array( [centroids_history[j][i] for j in range(h)] ).T ) #Linea que une puntos
+
+    for chistory in centroids_history:
+        for centroid in chistory: #Color de los puntos
+            plt.scatter(*centroid,marker="x")
+        
     plt.show()
 
 #Datos X
@@ -80,17 +88,18 @@ def computeCentroids(X,idx,K):
 
 def runkMeans(X,centroids, max_iters, plot=False):
     k = len(centroids)
+    if plot: history = [centroids] #Inicializar con 1 elemento
     for i in range(max_iters):
         idx = findClosestCentroids(X,centroids)
         centroids = computeCentroids(X,idx,k)
-    #graficarDatos(data,centroids)
+        if plot: history.append(centroids)
+    if plot: graficarDatos(data, np.array(history))
     return centroids
 
 if __name__ == '__main__':
     data = getDataFromFile("ex7data2.txt")
-    k = 3
+    k,iters = 3,1
     # centroids = kMeansInitCentroids(data,k,choice=False) # 3 clusters
-    centroids= np.array([[3,3],[6,2],[8, 5]]) # 3 clusters
-    centroids = runkMeans(data,centroids,10,plot=False)
-    print centroids
+    centroids = np.array([[3,3],[6,2],[8,5]]) # 3 clusters
+    centroids = runkMeans(data,centroids,iters,plot=True)
     
