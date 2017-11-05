@@ -91,7 +91,7 @@ def runkMeans(X,centroids, max_iters, plot=False):
 if __name__ == '__main__':
     data = getDataFromFile("ex7data2.txt")
     k,iters = 3,10
-    # centroids = kMeansInitCentroids(data,k,choice=False) # 3 clusters
-    centroids = np.array([[3,3],[6,2],[8,5]]) # 3 clusters
+    centroids = kMeansInitCentroids(data,k,choice=False) # 3 clusters
+    # centroids = np.array([[3,3],[6,2],[8,5]]) # 3 clusters
     centroids = runkMeans(data,centroids,iters,plot=True)
     
