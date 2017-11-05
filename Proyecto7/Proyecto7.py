@@ -1,12 +1,8 @@
 #Ruben Cuadra A01019102
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import matplotlib.patches as mpatches
 import numpy as np
-import math, csv, copy
-from random import random, uniform
-from enum import Enum
-import json, sys
+from random import uniform
+import csv
 
 def getDataFromFile(filename,delimiter=" "):  
     vals = []
@@ -77,11 +73,8 @@ def computeCentroids(X,idx,K):
             new_x += X[p][0] 
             new_y += X[p][1]
 
-        new_x /= elements
-        new_y /= elements
-
-        centroids[i][0] = new_x
-        centroids[i][1] = new_y
+        centroids[i][0] = new_x/elements
+        centroids[i][1] = new_y/elements
 
     return np.array(centroids)
 
