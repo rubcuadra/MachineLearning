@@ -40,28 +40,55 @@ def kMeansInitCentroids(X, K, choice=False):
         for i in range(K): centroids.append( [ uniform(mins[0],maxs[0]),uniform(mins[1],maxs[1]) ] )
     return np.array(centroids)
 
+#Datos X, arreglo de N+1 elementos donde cada elemento es un arreglo de [x,y]
+#Centroides ya inicializados, es un arreglo de N elementos donde cada elemento es un arreglo de [x,y] , es decir numeros
 def findClosestCentroids(X, i_centroids):
-    idx = [None]*len(i_centroids)
-
-
-    for x in X:
-        print i_centroids[0]
-        print x
+    idx = [ [] for i in range( len(i_centroids) ) ] #Init return 
+    for ix,x in enumerate(X):
+        ii = 0                  #Centroide mas cercano al punto x
+        min_dist = float("inf") #Distancia entre el punto x y ese centroide
+        for i,c in enumerate(i_centroids): #index, centroide
+            dist = np.linalg.norm(x-c)     #Distancia de la x actual con ese centroide
+            if dist<min_dist:              #Distancia a este punto es menor a la minima, actualizar
+                ii       = i
+                min_dist = dist 
         
-        dist = np.linalg.norm(x-i_centroids[0])
-        print dist
-        break
+        idx[ii].append(ix) #ya que calculamos a que centroide pertenece, agregar indice de esa X
 
+    return np.array( idx )
 
-    return idx
+#X son los datos iniciales
+#idx es un arreglo de K elementos, cada elemento posee un arreglo de indices de X 
+#K es la size de idx
+def computeCentroids(X,idx,K):
+    centroids = [ [0,0] for _ in range( K ) ] #Inicializar retorno
+    
+    for i,cluster in enumerate(idx):
+        new_x,new_y,elements = 0,0,len(cluster) #Coordenadas para este nuevo cluster, elementos
+        
+        for p in cluster:
+            new_x += X[p][0] 
+            new_y += X[p][1]
+
+        new_x /= elements
+        new_y /= elements
+
+        centroids[i][0] = new_x
+        centroids[i][1] = new_y
+
+    return np.array(centroids)
 
 if __name__ == '__main__':
     data = getDataFromFile("ex7data2.txt")
-    centroids=kMeansInitCentroids(data,3,choice=False) # 3 clusters
-    # initial_centroids=[[3,3],[6,2],[8, 5]] # 3 clusters
+    k = 3
+    centroids = kMeansInitCentroids(data,k,choice=False) # 3 clusters
+    
+    #centroids= np.array([[3,3],[6,2],[8, 5]]) # 3 clusters
+    #graficarDatos(data,centroids)
+
     for i in range(1):
         idx = findClosestCentroids(data,centroids);
-        print idx
+        centroids = computeCentroids(data,idx,k);
 
     #graficarDatos(data,centroids)
     
