@@ -78,19 +78,19 @@ def computeCentroids(X,idx,K):
 
     return np.array(centroids)
 
+def runkMeans(X,centroids, max_iters, plot=False):
+    k = len(centroids)
+    for i in range(max_iters):
+        idx = findClosestCentroids(X,centroids)
+        centroids = computeCentroids(X,idx,k)
+    #graficarDatos(data,centroids)
+    return centroids
+
 if __name__ == '__main__':
     data = getDataFromFile("ex7data2.txt")
     k = 3
-    centroids = kMeansInitCentroids(data,k,choice=False) # 3 clusters
+    # centroids = kMeansInitCentroids(data,k,choice=False) # 3 clusters
+    centroids= np.array([[3,3],[6,2],[8, 5]]) # 3 clusters
+    centroids = runkMeans(data,centroids,10,plot=False)
+    print centroids
     
-    #centroids= np.array([[3,3],[6,2],[8, 5]]) # 3 clusters
-    #graficarDatos(data,centroids)
-
-    for i in range(1):
-        idx = findClosestCentroids(data,centroids);
-        centroids = computeCentroids(data,idx,k);
-
-    #graficarDatos(data,centroids)
-    
-
-
