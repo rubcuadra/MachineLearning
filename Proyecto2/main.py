@@ -13,13 +13,13 @@ def buscarAlfa(xNormalizadas,Y,alpha=0.001,iteraciones=50, multiplicador=3):
 
 if __name__ == "__main__":
     #Leer archivos
-    xData, yData = getDataFromFile('datos.csv')
+    xData, yData = getDataFromFile('datosE.csv')
     thetasEcuacion = ecuacionNormal(xData,yData)
     print ('Thetas de la ecuacion normal ', thetasEcuacion)
     if len(xData[0]) > 1: #Se debe normalizar
         nX, mediasX, sigma = normalizacionDeCaracteristicas(xData)  #Normalizar X
         nY, mediasY, sigmaY = normalizacionDeCaracteristicas(yData) #Normalizar Y
-        jHistoriaGradiente, thetasGradiente  = gradienteDescendenteMultivariable(nX,nY, alpha=0.003 ,iteraciones=1500)
+        jHistoriaGradiente, thetasGradiente  = gradienteDescendenteMultivariable(nX,nY, alpha=0.01 ,iteraciones=4000)
         print ('Thetas usando gradiente descendente multivariable normalizado ', thetasGradiente)
         
         fixedX = np.append(np.ones((nX.shape[0],1)), nX , axis=1) #Agregar ones a X

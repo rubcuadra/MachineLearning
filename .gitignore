@@ -100,3 +100,5 @@ djangular/db.sqlite3
 
 #MAC
 .DS_STORE
+
+*/env
