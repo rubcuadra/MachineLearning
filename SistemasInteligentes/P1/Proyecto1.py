@@ -65,12 +65,43 @@ class Puzzle(object):
         else:
             self.ix = ix #(row,column)
         
-
     def __eq__(self, other):
         return self.board == other.board
 
     def __hash__(self):
         return hash(self.board)
+
+    @staticmethod
+    def getManhattanDistanceHeuristic(finalState):
+        finalPositions = {}
+        for i,row in enumerate(finalState):
+            for j,cell in enumerate(row):
+                finalPositions[cell] = (i,j) 
+        def h(s):
+            distance = 0
+            for i,row in enumerate(s):
+                for j,cell in enumerate(row):
+                    finalPos = finalPositions[cell]
+                    distance += abs(finalPos[0] - i) + abs(finalPos[1] - j)
+                    if i!=finalPos[0] or j!=finalPos[1]:
+                        print(cell,i,j, finalPos)
+            return distance
+        return h
+
+    @staticmethod
+    def getWrongCellsHeuristic(finalState):
+        finalPositions = {}
+        for i,row in enumerate(finalState):
+            for j,cell in enumerate(row):
+                finalPositions[cell] = (i,j) 
+        def h(s):
+            wrong = 0
+            for i,row in enumerate(s):
+                for j,cell in enumerate(row):
+                    if i==finalPositions[cell][0] and j==finalPositions[cell][1]: continue
+                    wrong+=1
+            return wrong
+        return h
 
     def getMovement(self,movement): #We assume that canMove was called already 
         matrix = list( map(list, self.board) ) #Copy that can be edited but it is not hashable - TODO improve this structure
@@ -135,10 +166,9 @@ def busquedaNoInformada(edoInicial, edoFinal, DFS=True): #0 BFS o 1 para DFS
     return [] if answer is None else answer.backTrack() #Answer is a node pointing to more nodes
 
 if __name__ == '__main__':
-    # PuzzleNode.setHeuristic()
-
     edoInicial  = [[0, 1, 2], [4, 5, 3], [7, 8, 6]]
     edoFinal = [[1, 2, 3], [4, 5, 6], [7, 8, 0]] 
-
+    # PuzzleNode.setHeuristic( Puzzle.getManhattanDistanceHeuristic( edoFinal ) )
+    # PuzzleNode.setHeuristic( Puzzle.getWrongCellsHeuristic( edoFinal ) )
     steps = busquedaNoInformada(edoInicial, edoFinal, 0) # puede llamarse con 1
     print (steps)
