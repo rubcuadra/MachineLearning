@@ -8,21 +8,31 @@ class Movements(Enum):
     LEFT  = "L"
     RIGHT = "R"
 
+class PuzzleEdge(object):
+    def __init__(self, tag, val=1):
+        super(PuzzleEdge, self).__init__()
+        self.tag      = tag
+        self.val      = val
+
 class PuzzleNode(object): #Wrapper for Tree functionalities
     def __init__(self, _puzzle, parentNode=None, edge=None):
         super(PuzzleNode, self).__init__()
         self.state      = _puzzle
         self.parentNode = parentNode
         self.edge       = edge if parentNode!=None else None #It is the action/value that connects with the parentNode
+        self.val        = 1 #There is no heuristic
 
     def getCombinations(self): #Iterator
         for m in Movements:    #TRY all existing movements
             if self.state.canMove( m ):
-                yield PuzzleNode( self.state.getMovement(m), parentNode=self, edge=m ) #Move returns a Puzzle object
+                yield PuzzleNode( self.state.getMovement(m), parentNode=self, edge=PuzzleEdge(m) ) #Move returns a Puzzle object
         
     def backTrack(self):
         if self.parentNode is None: return []
-        return self.parentNode.backTrack() + [self.edge.value] #enums have .value
+        return self.parentNode.backTrack() + [self.edge.tag.value] #self.edge.tag is an enum, it has a .value
+
+    def __lt__(self,other): #For priority queue, would be better to use edge and val
+        return self.val > other.val
 
 class Puzzle(object):
     EMPTY_SPACE = 0
