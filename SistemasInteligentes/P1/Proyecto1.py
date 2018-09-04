@@ -15,12 +15,21 @@ class PuzzleEdge(object):
         self.val      = val
 
 class PuzzleNode(object): #Wrapper for Tree functionalities
+    @classmethod
+    def setHeuristic(cls, f): cls.heuristic = f
+
+    @staticmethod
+    def heuristic(state):     return 0
+
     def __init__(self, _puzzle, parentNode=None, edge=None):
         super(PuzzleNode, self).__init__()
         self.state      = _puzzle
         self.parentNode = parentNode
         self.edge       = edge if parentNode!=None else None #It is the action/value that connects with the parentNode
-        self.val        = 1 #There is no heuristic
+        self.updateVal() #According to the heuristic
+
+    def updateVal(self):
+        self.val = self.__class__.heuristic(self.state)
 
     def getCombinations(self): #Iterator
         for m in Movements:    #TRY all existing movements
@@ -31,8 +40,8 @@ class PuzzleNode(object): #Wrapper for Tree functionalities
         if self.parentNode is None: return []
         return self.parentNode.backTrack() + [self.edge.tag.value] #self.edge.tag is an enum, it has a .value
 
-    def __lt__(self,other): #For priority queue, would be better to use edge and val
-        return self.val > other.val
+    def __lt__(self,other): #For priority queue, would be better to use edge and val, it uses heuristic
+        return self.val > other.val #self.edge.val + self.val #Costo real + Heuristica
 
 class Puzzle(object):
     EMPTY_SPACE = 0
@@ -126,6 +135,8 @@ def busquedaNoInformada(edoInicial, edoFinal, DFS=True): #0 BFS o 1 para DFS
     return [] if answer is None else answer.backTrack() #Answer is a node pointing to more nodes
 
 if __name__ == '__main__':
+    # PuzzleNode.setHeuristic()
+
     edoInicial  = [[0, 1, 2], [4, 5, 3], [7, 8, 6]]
     edoFinal = [[1, 2, 3], [4, 5, 6], [7, 8, 0]] 
 
