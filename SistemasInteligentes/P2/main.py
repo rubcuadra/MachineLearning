@@ -46,6 +46,16 @@ class PuzzleNode(object): #Wrapper for Tree functionalities
 #TODO Convert to an iterable class
 class Puzzle(object):
     EMPTY_SPACE = 0
+
+    def __iter__(self):
+        self.i = 0
+        return self
+
+    def __next__(self):
+        if self.i >= self.shape[0]: 
+            raise StopIteration
+        self.i += 1
+        return self.board[self.i-1]
     
     def __init__(self, val, ix = None):
         super(Puzzle, self).__init__()
@@ -164,7 +174,7 @@ def busquedaNoInformada(edoInicial, edoFinal, heuristic=None): #0 BFS o 1 para D
             answer = currentNode            #Save the answer
             break                           #We have finished
         if currentNode.state in visited: continue  
-        structure.extend( currentNode.getCombinations() ) #Add the elements to the structure
+        for combination in currentNode.getCombinations(): structure.put( combination  ) #Add the elements to the structure
         visited.add( currentNode.state )
 
     return [] if answer is None else answer.backTrack() #Answer is a node pointing to more nodes
