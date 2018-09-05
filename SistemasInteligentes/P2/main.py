@@ -169,18 +169,14 @@ def busquedaInformada(edoInicial, edoFinal, heuristic=None): #0 BFS o 1 para DFS
 
     structure = PQ()    
     structure.put(root)
-    visited = set()
-    c=0
-    while not structure.empty(): 
-        c+=1
+    
+    while not structure.empty():     
         currentNode = structure.get()   
         if currentNode.state == finalState: #Node is the wrapper, we only compare the puzzle
             answer = currentNode            #Save the answer
             break                           #We have finished
-        if currentNode.state in visited: continue  
         for combination in currentNode.getCombinations(): structure.put( combination  ) #Add the elements to the structure
-        visited.add( currentNode.state )
-    print(c)
+        
     return [] if answer is None else answer.backTrack() #Answer is a node pointing to more nodes
 
 if __name__ == '__main__':
