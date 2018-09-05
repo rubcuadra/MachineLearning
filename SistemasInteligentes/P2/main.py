@@ -8,6 +8,10 @@ class Movements(Enum):
     LEFT  = "L"
     RIGHT = "R"
 
+class Heuristics(Enum):
+    MANHATTAN = 0
+    WRONG_POSITION = 1
+
 class PuzzleEdge(object):
     def __init__(self, tag, val=1):
         super(PuzzleEdge, self).__init__()
@@ -94,8 +98,6 @@ class Puzzle(object):
                 for j,cell in enumerate(row):
                     finalPos = finalPositions[cell]
                     distance += abs(finalPos[0] - i) + abs(finalPos[1] - j)
-                    if i!=finalPos[0] or j!=finalPos[1]:
-                        print(cell,i,j, finalPos)
             return distance
         return h
 
@@ -156,9 +158,10 @@ edoInicial: Un estado inicial del 8‐puzzle. El estado inicial es una lista de 
 edoFinal  : Un estado meta del 8‐puzzle. Representado igual que el estado inicial (es decir, con una lista de listas de dígitos)
 algoritmo : El tipo de algoritmo a utilizar. Esta es una variable entera, si su valor es 0, se debe usar BFS y si es 1, DFS.
 '''
-def busquedaNoInformada(edoInicial, edoFinal, heuristic=None): #0 BFS o 1 para DFS
-    # PuzzleNode.setHeuristic( Puzzle.getManhattanDistanceHeuristic( edoFinal ) )
-    PuzzleNode.setHeuristic( Puzzle.getWrongCellsHeuristic( edoFinal ) )
+def busquedaInformada(edoInicial, edoFinal, heuristic=None): #0 BFS o 1 para DFS
+    if   heuristic is Heuristics.MANHATTAN:       PuzzleNode.setHeuristic( Puzzle.getManhattanDistanceHeuristic( edoFinal ) )
+    elif heuristic is Heuristics.WRONG_POSITION:  PuzzleNode.setHeuristic( Puzzle.getWrongCellsHeuristic( edoFinal ) )
+
 
     root       = PuzzleNode( Puzzle(edoInicial) )  #Inicializar raiz
     finalState = Puzzle(edoFinal)
@@ -182,5 +185,5 @@ def busquedaNoInformada(edoInicial, edoFinal, heuristic=None): #0 BFS o 1 para D
 if __name__ == '__main__':
     edoInicial  = [[0, 1, 2], [4, 5, 3], [7, 8, 6]]
     edoFinal = [[1, 2, 3], [4, 5, 6], [7, 8, 0]] 
-    steps = busquedaNoInformada(edoInicial, edoFinal) # puede llamarse con 1
+    steps = busquedaInformada(edoInicial, edoFinal, Heuristics.MANHATTAN) # puede llamarse con 1
     print (steps)
