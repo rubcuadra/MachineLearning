@@ -45,7 +45,7 @@ class PuzzleNode(object): #Wrapper for Tree functionalities
         return self.parentNode.backTrack() + [self.edge.tag.value] #self.edge.tag is an enum, it has a .value
 
     def __lt__(self,other): #For priority queue, would be better to use edge and val, it uses heuristic
-        return self.val > other.val #self.edge.val + self.val #Costo real + Heuristica
+        return self.val < other.val #self.edge.val + self.val #Costo real + Heuristica
 
 #TODO Convert to an iterable class
 class Puzzle(object):
@@ -170,8 +170,9 @@ def busquedaInformada(edoInicial, edoFinal, heuristic=None): #0 BFS o 1 para DFS
     structure = PQ()    
     structure.put(root)
     visited = set()
-
+    c=0
     while not structure.empty(): 
+        c+=1
         currentNode = structure.get()   
         if currentNode.state == finalState: #Node is the wrapper, we only compare the puzzle
             answer = currentNode            #Save the answer
@@ -179,11 +180,11 @@ def busquedaInformada(edoInicial, edoFinal, heuristic=None): #0 BFS o 1 para DFS
         if currentNode.state in visited: continue  
         for combination in currentNode.getCombinations(): structure.put( combination  ) #Add the elements to the structure
         visited.add( currentNode.state )
-
+    print(c)
     return [] if answer is None else answer.backTrack() #Answer is a node pointing to more nodes
 
 if __name__ == '__main__':
     edoInicial  = [[0, 1, 2], [4, 5, 3], [7, 8, 6]]
     edoFinal = [[1, 2, 3], [4, 5, 6], [7, 8, 0]] 
-    steps = busquedaInformada(edoInicial, edoFinal, Heuristics.MANHATTAN) # puede llamarse con 1
+    steps = busquedaInformada(edoInicial, edoFinal, Heuristics.WRONG_POSITION) # puede llamarse con 1
     print (steps)
