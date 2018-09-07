@@ -13,5 +13,5 @@ if __name__ == '__main__':
     	[7, 8, 0]
     ] 
 
-    steps = busquedaAstar(edoInicial, edoFinal, 1) # puede llamarse con 1
+    steps = busquedaAstar(edoInicial, edoFinal, 1) # puede llamarse con 0
     print (steps)
