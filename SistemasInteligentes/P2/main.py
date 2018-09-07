@@ -29,13 +29,13 @@ class PuzzleNode(object): #Wrapper for Tree functionalities
         self.edge       = edge if parentNode!=None else None #It is the action/value that connects with the parentNode
         self.updateCost() #According to the heuristic
 
-    #f(n) = g(n) + h(n) 
+    #h(n) = g(n) + f(n) 
     #g(n) is the cost from root to this node 
-    #h(n) is obtained with the heuristic
+    #f(n) is obtained with the heuristic
     def updateCost(self):  
-        self.realCost = self.getCostToRoot()
-        self.hCost    = self.__class__.heuristic( self.state )
-        self.cost     = self.realCost + self.hCost 
+        self.gScore = self.getCostToRoot()
+        self.fScore = self.__class__.heuristic( self.state )
+        self.cost     = self.gScore + self.fScore 
 
     def getCombinations(self): #Iterator
         for m in Movements:    #TRY all existing movements
