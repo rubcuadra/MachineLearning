@@ -8,10 +8,7 @@ class Movements(Enum):
     LEFT  = "L"
     RIGHT = "R"
 
-class Heuristics(Enum):
-    MANHATTAN = 0
-    WRONG_POSITION = 1
-
+#For backtrack and sum of costs
 class PuzzleEdge(object):
     def __init__(self, tag, val=1):
         super(PuzzleEdge, self).__init__()
@@ -32,22 +29,28 @@ class PuzzleNode(object): #Wrapper for Tree functionalities
         self.edge       = edge if parentNode!=None else None #It is the action/value that connects with the parentNode
         self.updateVal() #According to the heuristic
 
-    def updateVal(self):
-        self.val = self.__class__.heuristic( self.state )
+    #f(n) = g(n) + h(n) 
+    #g(n) is the cost from root to this node ; Maybe pass from node instead of calculate it? it'd be more efficient (code won't look cool tho)
+    #h(n) is obtained with the heuristic
+    def updateVal(self):  
+        self.val = self.getCostToRoot() + self.__class__.heuristic( self.state )
 
     def getCombinations(self): #Iterator
         for m in Movements:    #TRY all existing movements
             if self.state.canMove( m ):
                 yield PuzzleNode( self.state.getMovement(m), parentNode=self, edge=PuzzleEdge(m) ) #Move returns a Puzzle object
         
-    def backTrack(self):
+    def getCostToRoot(self):#Returns the sum of costs
+        if self.parentNode is None: return 0
+        return self.parentNode.getCostToRoot() + self.edge.val
+
+    def backTrack(self):    #Return the tags as array
         if self.parentNode is None: return []
         return self.parentNode.backTrack() + [self.edge.tag.value] #self.edge.tag is an enum, it has a .value
 
     def __lt__(self,other): #For priority queue, would be better to use edge and val, it uses heuristic
         return self.val < other.val #self.edge.val + self.val #Costo real + Heuristica
 
-#TODO Convert to an iterable class
 class Puzzle(object):
     EMPTY_SPACE = 0
 
@@ -65,11 +68,11 @@ class Puzzle(object):
         super(Puzzle, self).__init__()
         #Convert from [[0, 1, 2], [4, 5, 3], [7, 8, 6]] to ((0, 1, 2), (4, 5, 3), (7, 8, 6))
         self.shape = ( len(val), len(val[0]) )
-        self.board = tuple( map(tuple,val) )  #Tuples are hashables TODO - improve this structure
-        self.ix    = None
+        self.board = val  #No need of tuples since we are not hashing
+        self.ix    = None #Empty space index
 
         #Find the empty space
-        if ix is None: #We need to find the index of the 0
+        if ix is None: #If they don't give an ix we need to find it by searching in matrix
             for i,row in enumerate(val):
                 for j,cell in enumerate(row):
                     if cell == self.EMPTY_SPACE:
@@ -78,13 +81,13 @@ class Puzzle(object):
                 if self.ix != None:         #Alerady got it
                     break
         else:
-            self.ix = ix #(row,column)
+            self.ix = ix #is a tuple of (row,column)
         
     def __eq__(self, other):
-        return self.board == other.board
+        return self.board == other.board #It compares matrix boards
 
     def __hash__(self):
-        return hash(self.board)
+        return hash(self.board) #ERROR because we are using lists, it was working for tuples
 
     @staticmethod
     def getManhattanDistanceHeuristic(finalState):
@@ -118,7 +121,7 @@ class Puzzle(object):
         return h
 
     def getMovement(self,movement): #We assume that canMove was called already 
-        matrix = list( map(list, self.board) ) #Copy that can be edited but it is not hashable - TODO improve this structure
+        matrix = list( map(list, self.board) ) #Copy current state
         
         if movement is Movements.UP:
             matrix[  self.ix[0]   ][ self.ix[1] ] = matrix[ self.ix[0]-1 ][ self.ix[1] ]
@@ -156,12 +159,11 @@ class Puzzle(object):
 '''
 edoInicial: Un estado inicial del 8‐puzzle. El estado inicial es una lista de listas, donde cada lista interna contendrá 3 dígitos del 0 al 8 representa un renglón del 8‐puzzle. El espacio será representado por el número 0. Por ejemplo, el estado mostrado en la figura 1 se representará con la lista: [[1, 2, 3], [4, 5, 6], [7, 8, 0]].
 edoFinal  : Un estado meta del 8‐puzzle. Representado igual que el estado inicial (es decir, con una lista de listas de dígitos)
-algoritmo : El tipo de algoritmo a utilizar. Esta es una variable entera, si su valor es 0, se debe usar BFS y si es 1, DFS.
+heuristic : 1 or 0, es la heuristica a usar
 '''
-def busquedaInformada(edoInicial, edoFinal, heuristic=None): #0 BFS o 1 para DFS
-    if   heuristic is Heuristics.MANHATTAN:       PuzzleNode.setHeuristic( Puzzle.getManhattanDistanceHeuristic( edoFinal ) )
-    elif heuristic is Heuristics.WRONG_POSITION:  PuzzleNode.setHeuristic( Puzzle.getWrongCellsHeuristic( edoFinal ) )
-
+def busquedaAstar(edoInicial, edoFinal, heuristic=1): #0 Cuadros o 1 para Manhattan Distance
+    if   heuristic:   PuzzleNode.setHeuristic( Puzzle.getManhattanDistanceHeuristic( edoFinal ) )
+    else:             PuzzleNode.setHeuristic( Puzzle.getWrongCellsHeuristic( edoFinal ) )
 
     root       = PuzzleNode( Puzzle(edoInicial) )  #Inicializar raiz
     finalState = Puzzle(edoFinal)
@@ -176,11 +178,10 @@ def busquedaInformada(edoInicial, edoFinal, heuristic=None): #0 BFS o 1 para DFS
             answer = currentNode            #Save the answer
             break                           #We have finished
         for combination in currentNode.getCombinations(): structure.put( combination  ) #Add the elements to the structure
-        
     return [] if answer is None else answer.backTrack() #Answer is a node pointing to more nodes
 
 if __name__ == '__main__':
     edoInicial  = [[0, 1, 2], [4, 5, 3], [7, 8, 6]]
     edoFinal = [[1, 2, 3], [4, 5, 6], [7, 8, 0]] 
-    steps = busquedaInformada(edoInicial, edoFinal, Heuristics.WRONG_POSITION) # puede llamarse con 1
+    steps = busquedaAstar(edoInicial, edoFinal, 0) # puede llamarse con 1
     print (steps)
