@@ -10,10 +10,10 @@ class Movements(Enum):
 
 #For backtrack and sum of costs
 class PuzzleEdge(object):
-    def __init__(self, tag, val=1):
+    def __init__(self, tag, value=1):
         super(PuzzleEdge, self).__init__()
-        self.tag      = tag
-        self.val      = val
+        self.tag        = tag
+        self.value      = value
 
 class PuzzleNode(object): #Wrapper for Tree functionalities
     @classmethod
@@ -27,13 +27,15 @@ class PuzzleNode(object): #Wrapper for Tree functionalities
         self.state      = _puzzle
         self.parentNode = parentNode
         self.edge       = edge if parentNode!=None else None #It is the action/value that connects with the parentNode
-        self.updateVal() #According to the heuristic
+        self.updateCost() #According to the heuristic
 
     #f(n) = g(n) + h(n) 
-    #g(n) is the cost from root to this node ; Maybe pass from node instead of calculate it? it'd be more efficient (code won't look cool tho)
+    #g(n) is the cost from root to this node 
     #h(n) is obtained with the heuristic
-    def updateVal(self):  
-        self.val = self.getCostToRoot() + self.__class__.heuristic( self.state )
+    def updateCost(self):  
+        self.realCost = self.getCostToRoot()
+        self.hCost    = self.__class__.heuristic( self.state )
+        self.cost     = self.realCost + self.hCost 
 
     def getCombinations(self): #Iterator
         for m in Movements:    #TRY all existing movements
@@ -42,14 +44,15 @@ class PuzzleNode(object): #Wrapper for Tree functionalities
         
     def getCostToRoot(self):#Returns the sum of costs
         if self.parentNode is None: return 0
-        return self.parentNode.getCostToRoot() + self.edge.val
+        return self.parentNode.getCostToRoot() + self.edge.value
 
     def backTrack(self):    #Return the tags as array
         if self.parentNode is None: return []
         return self.parentNode.backTrack() + [self.edge.tag.value] #self.edge.tag is an enum, it has a .value
 
-    def __lt__(self,other): #For priority queue, would be better to use edge and val, it uses heuristic
-        return self.val < other.val #self.edge.val + self.val #Costo real + Heuristica
+    #Cost was calculated in constructor
+    def __lt__(self,other): 
+        return self.cost < other.cost
 
 class Puzzle(object):
     EMPTY_SPACE = 0
@@ -171,9 +174,11 @@ def busquedaAstar(edoInicial, edoFinal, heuristic=1): #0 Cuadros o 1 para Manhat
 
     structure = PQ()    
     structure.put(root)
-    
-    while not structure.empty():     
+    cost = float("inf")                     #Instead of visited, we should try to decrease this val, at the end bestVal == realCost of the best solution
+    while not structure.empty():   
         currentNode = structure.get()   
+        if    cost < currentNode.cost: break #There is no end, the best solutions have already been visited
+        else: cost = currentNode.cost
         if currentNode.state == finalState: #Node is the wrapper, we only compare the puzzle
             answer = currentNode            #Save the answer
             break                           #We have finished
@@ -183,5 +188,5 @@ def busquedaAstar(edoInicial, edoFinal, heuristic=1): #0 Cuadros o 1 para Manhat
 if __name__ == '__main__':
     edoInicial  = [[0, 1, 2], [4, 5, 3], [7, 8, 6]]
     edoFinal = [[1, 2, 3], [4, 5, 6], [7, 8, 0]] 
-    steps = busquedaAstar(edoInicial, edoFinal, 0) # puede llamarse con 1
+    steps = busquedaAstar(edoInicial, edoFinal, 1) # puede llamarse con 1
     print (steps)
