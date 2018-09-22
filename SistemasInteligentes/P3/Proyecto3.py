@@ -30,6 +30,9 @@ class QueensBoard(object):
         #Evaluate that board
         self.score = self.evaluate()
     
+    def __hash__(self):
+        return hash( tuple(self.positions) ) 
+
     #Cost was calculated in constructor
     def __lt__(self,other): 
         return self.score < other.score
@@ -103,17 +106,22 @@ def busquedaHC(Q=8,S=True,T=5):
     for i in range(T):
         print(f"iter {i+1}")
         currentB = QueensBoard(Q)
+        visited = set()
+        structure = PQ()
         while True:   
-            structure = PQ()
+            if S: visited.add(currentB) #Only for side movements
             #Create neighbors and add them to the priority queue
             for combination in currentB.getCombinations(): structure.put( combination  )
-            #If not visited??
+            
             nextB = structure.get() #Pop the best
+            
+            if S: #Move to equal non visited nodes
+                while nextB in visited: nextB = structure.get() 
 
             if not betterNeighbor(nextB,currentB): break
             if nextB.score < currentB.score: print("\t",nextB.score)
             currentB = nextB
-        
+
         if currentB.score == 0:
             print(f"Solucion encontrada en el intento {i+1}")
             print(currentB)
@@ -123,10 +131,9 @@ def busquedaHC(Q=8,S=True,T=5):
     
     print(f"Solucion no encontrada en {T} intentos")
     print(best)
-    print(best.score)
 
 if __name__ == '__main__':
     N = 8
-    lateral = False
-    M = 100
+    lateral = True
+    M = 3
     busquedaHC(N, lateral, M)
