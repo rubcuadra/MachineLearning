@@ -3,7 +3,7 @@ from queue import PriorityQueue as PQ
 from random import randint, seed
 from collections import Counter
 from enum import Enum
-seed(0)
+# seed(0)
 class QueenMovements(Enum): 
     '''
         We only move them up and down because there's 
@@ -101,6 +101,7 @@ def busquedaHC(Q=8,S=True,T=5):
     print(f"Algoritmo 'Hill Climbing' {'con' if S else 'sin'} movimientos laterales")
     best = None
     for i in range(T):
+        print(f"iter {i+1}")
         structure = PQ()
         currentB = QueensBoard(Q)
         while True:   
@@ -108,6 +109,7 @@ def busquedaHC(Q=8,S=True,T=5):
             for combination in currentB.getCombinations(): structure.put( combination  )
             nextB = structure.get() #Pop the best
             if not betterNeighbor(nextB,currentB): break
+            if nextB.score < currentB.score: print(nextB.score)
             currentB = nextB
         
         if currentB.score == 0:
@@ -123,6 +125,6 @@ def busquedaHC(Q=8,S=True,T=5):
 
 if __name__ == '__main__':
     N = 8
-    lateral = False
-    M = 30
+    lateral = True
+    M = 3
     busquedaHC(N, lateral, M)
