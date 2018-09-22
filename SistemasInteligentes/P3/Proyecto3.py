@@ -107,9 +107,11 @@ def busquedaHC(Q=8,S=True,T=5):
             structure = PQ()
             #Create neighbors and add them to the priority queue
             for combination in currentB.getCombinations(): structure.put( combination  )
+            #If not visited??
             nextB = structure.get() #Pop the best
+
             if not betterNeighbor(nextB,currentB): break
-            if nextB.score < currentB.score: print(nextB.score)
+            if nextB.score < currentB.score: print("\t",nextB.score)
             currentB = nextB
         
         if currentB.score == 0:
@@ -125,6 +127,6 @@ def busquedaHC(Q=8,S=True,T=5):
 
 if __name__ == '__main__':
     N = 8
-    lateral = True
-    M = 3
+    lateral = False
+    M = 100
     busquedaHC(N, lateral, M)
