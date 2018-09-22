@@ -109,12 +109,16 @@ def busquedaHC(Q=8,S=True,T=float("inf")):
         currentB = QueensBoard(Q)
         visited = set()
         while True:   
+            
             structure = PQ()
             #Create neighbors and add them to the priority queue
             for combination in currentB.getCombinations(): structure.put( combination  )
             
             nextB = structure.get() #Pop the best
-            
+            if S: #Can move to the side
+                visited.add(currentB)
+                while (nextB in visited) and (not structure.empty()): nextB = structure.get()
+                if nextB in visited: break #Ya se visito todo aqui                            
             if not betterNeighbor(nextB,currentB): break
             # if nextB.score < currentB.score: print(nextB.score)
             currentB = nextB
