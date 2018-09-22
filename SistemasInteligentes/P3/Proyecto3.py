@@ -102,9 +102,9 @@ def busquedaHC(Q=8,S=True,T=5):
     best = None
     for i in range(T):
         print(f"iter {i+1}")
-        structure = PQ()
         currentB = QueensBoard(Q)
         while True:   
+            structure = PQ()
             #Create neighbors and add them to the priority queue
             for combination in currentB.getCombinations(): structure.put( combination  )
             nextB = structure.get() #Pop the best
