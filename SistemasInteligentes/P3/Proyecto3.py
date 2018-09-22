@@ -3,7 +3,6 @@ from queue import PriorityQueue as PQ
 from random import randint, seed
 from collections import Counter
 from enum import Enum
-seed(1)
 
 class QueenMovements(Enum): 
     '''
@@ -119,19 +118,21 @@ def busquedaHC(Q=8,S=True,T=5):
             currentB = nextB
         
         if currentB.score == 0:
-            print(f"Solucion encontrada en el intento {i+1}")
+            print(f"\nSolucion encontrada en el intento {i+1}")
             print(currentB)
             return
         
         #Closest solution 
         if best: best = best if best<currentB else currentB
         else:    best = currentB
-    print(f"Solucion no encontrada en {T} intentos")
+    print(f"\nSolucion no encontrada en {T} intentos")
     print(best)
 
 if __name__ == '__main__':
+    #Este seguro encuentra una solucion
+    seed(1)
     N = 8
     lateral = False
-    M = 50
+    M = 40
     busquedaHC(N, lateral, M)
     
