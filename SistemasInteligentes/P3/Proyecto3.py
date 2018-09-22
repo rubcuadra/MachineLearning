@@ -46,20 +46,20 @@ class QueensBoard(object):
     #Heuristic, it is the number of attacks between queens, can be > Q
     def evaluate(self):
         #Count repeated in array
-        count = sum( Counter(self.positions).values() ) 
-        #Check diagonals, count+=2 because both of them attack each other
+        count = sum( [v-1 for v in Counter(self.positions).values()] ) 
+        #Check diagonals
         for col,row in enumerate( self.positions ) :
             #Upper Left
             tr = row-1
             tc = col-1
             while tr>=0 and tc>=0:
-                if self.queenAtCell(tr,tc): count+=2 ; break
+                if self.queenAtCell(tr,tc): count+=1 ; break
                 tr -= 1; tc -= 1
             #Upper Right
             tr = row-1
             tc = col+1
             while tr>=0 and tc<self.Q:
-                if self.queenAtCell(tr,tc): count+=2 ; break
+                if self.queenAtCell(tr,tc): count+=1 ; break
                 tr -= 1; tc += 1
             #No need to check Lower L-R
         return count
@@ -104,11 +104,10 @@ def busquedaHC(Q=8,S=True,T=5):
     print(f"Algoritmo 'Hill Climbing' {'con' if S else 'sin'} movimientos laterales")
     best = None
     for i in range(T):
-        print(f"iter {i+1}")
         currentB = QueensBoard(Q)
         visited = set()
-        structure = PQ()
         while True:   
+            structure = PQ()
             if S: visited.add(currentB) #Only for side movements
             #Create neighbors and add them to the priority queue
             for combination in currentB.getCombinations(): structure.put( combination  )
@@ -121,7 +120,7 @@ def busquedaHC(Q=8,S=True,T=5):
             if not betterNeighbor(nextB,currentB): break
             if nextB.score < currentB.score: print("\t",nextB.score)
             currentB = nextB
-
+            
         if currentB.score == 0:
             print(f"Solucion encontrada en el intento {i+1}")
             print(currentB)
@@ -137,3 +136,7 @@ if __name__ == '__main__':
     lateral = True
     M = 3
     busquedaHC(N, lateral, M)
+    # sol = QueensBoard(8,[3,5,7,1,6,0,2,4])
+    # print(sol)
+    # print(sol.score)
+
