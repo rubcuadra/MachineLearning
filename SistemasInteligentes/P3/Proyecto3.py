@@ -3,12 +3,13 @@ from queue import PriorityQueue as PQ
 from random import randint, seed
 from collections import Counter
 from enum import Enum
-# seed(0)
+seed(1)
+
 class QueenMovements(Enum): 
     '''
         We only move them up and down because there's 
-        already 1 Queen in each column of the board 
-        it makes no sense to move horizontally or diagonally
+        already 1 Queen in each column, it makes no sense 
+        to move them horizontally or diagonally
     '''
     UP    = 0
     DOWN  = 1
@@ -108,35 +109,29 @@ def busquedaHC(Q=8,S=True,T=5):
         visited = set()
         while True:   
             structure = PQ()
-            if S: visited.add(currentB) #Only for side movements
             #Create neighbors and add them to the priority queue
             for combination in currentB.getCombinations(): structure.put( combination  )
             
             nextB = structure.get() #Pop the best
             
-            if S: #Move to equal non visited nodes
-                while nextB in visited: nextB = structure.get() 
-
             if not betterNeighbor(nextB,currentB): break
-            if nextB.score < currentB.score: print("\t",nextB.score)
+            # if nextB.score < currentB.score: print(nextB.score)
             currentB = nextB
-            
+        
         if currentB.score == 0:
             print(f"Solucion encontrada en el intento {i+1}")
             print(currentB)
             return
+        
+        #Closest solution 
         if best: best = best if best<currentB else currentB
         else:    best = currentB
-    
     print(f"Solucion no encontrada en {T} intentos")
     print(best)
 
 if __name__ == '__main__':
     N = 8
-    lateral = True
-    M = 3
+    lateral = False
+    M = 50
     busquedaHC(N, lateral, M)
-    # sol = QueensBoard(8,[3,5,7,1,6,0,2,4])
-    # print(sol)
-    # print(sol.score)
-
+    
