@@ -98,12 +98,14 @@ class QueensBoard(object):
 #Q Number of Queens (The board has size QxQ)
 #S Bool Flag that allows side movements, If True Hill Climbing algorithm allows lateral movements (Move to a node with same score)
 #T Number of tries
-def busquedaHC(Q=8,S=True,T=5):
+def busquedaHC(Q=8,S=True,T=float("inf")):
     #Compare using Side flag is <= , else is <
     betterNeighbor  = lambda x,y: x<=y if S else x<y 
     print(f"Algoritmo 'Hill Climbing' {'con' if S else 'sin'} movimientos laterales")
     best = None
-    for i in range(T):
+    i = 0
+    while T>0:
+        i,T = i+1, T-1
         currentB = QueensBoard(Q)
         visited = set()
         while True:   
@@ -118,21 +120,20 @@ def busquedaHC(Q=8,S=True,T=5):
             currentB = nextB
         
         if currentB.score == 0:
-            print(f"\nSolucion encontrada en el intento {i+1}")
+            print(f"\nSolucion encontrada en el intento {i}")
             print(currentB)
             return
         
         #Closest solution 
         if best: best = best if best<currentB else currentB
         else:    best = currentB
-    print(f"\nSolucion no encontrada en {T} intentos")
+    print(f"\nSolucion no encontrada en {i} intentos")
     print(best)
 
 if __name__ == '__main__':
-    #Este seguro encuentra una solucion
     seed(1)
-    N = 8
+    N = 10
     lateral = False
-    M = 40
+    M = 9300
     busquedaHC(N, lateral, M)
     
