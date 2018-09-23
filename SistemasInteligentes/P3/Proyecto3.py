@@ -95,49 +95,61 @@ class QueensBoard(object):
                 if self.canMove( i,m ):
                     yield self._move(i,m) 
 
+def HC(Q,S=False):
+    betterNeighbor  = lambda x,y: x<=y if S else x<y 
+    currentB = QueensBoard(Q)
+    visited = set()
+    while True:   
+        structure = PQ()
+        #Create neighbors and add them to the priority queue
+        for combination in currentB.getCombinations(): structure.put( combination  )
+        
+        nextB = structure.get() #Pop the best
+        if S: #Can move to the side
+            visited.add(currentB)
+            while (nextB in visited) and (not structure.empty()): nextB = structure.get()
+            if nextB in visited: break #Ya se visito todo aqui                            
+        if not betterNeighbor(nextB,currentB): break
+        # if nextB.score < currentB.score: print(nextB.score)
+        currentB = nextB
+
+    return currentB
+
 #Q Number of Queens (The board has size QxQ)
 #S Bool Flag that allows side movements, If True Hill Climbing algorithm allows lateral movements (Move to a node with same score)
 #T Number of tries
-def busquedaHC(Q=8,S=True,T=float("inf")):
+def busquedaHC(Q=8,S=False,T=float("inf")):
     #Compare using Side flag is <= , else is <
-    betterNeighbor  = lambda x,y: x<=y if S else x<y 
     print(f"Algoritmo 'Hill Climbing' {'con' if S else 'sin'} movimientos laterales")
+    
+    # pool = Pool(cpu_count()) #Parallelize crawlers
+    # tp = tuple( product(subreddits, keyWords, [opd], [dumpType]) )
+    # pool.starmap(dumpSubredditPosts, tp ) 
+    # pool.close()
+    # pool.join()
+
     best = None
     i = 0
     while T>0:
         i,T = i+1, T-1
-        currentB = QueensBoard(Q)
-        visited = set()
-        while True:   
-            
-            structure = PQ()
-            #Create neighbors and add them to the priority queue
-            for combination in currentB.getCombinations(): structure.put( combination  )
-            
-            nextB = structure.get() #Pop the best
-            if S: #Can move to the side
-                visited.add(currentB)
-                while (nextB in visited) and (not structure.empty()): nextB = structure.get()
-                if nextB in visited: break #Ya se visito todo aqui                            
-            if not betterNeighbor(nextB,currentB): break
-            # if nextB.score < currentB.score: print(nextB.score)
-            currentB = nextB
         
-        if currentB.score == 0:
+        sol = HC(Q,S)
+        
+        if sol.score == 0:
             print(f"\nSolucion encontrada en el intento {i}")
-            print(currentB)
+            print(sol)
             return
         
         #Closest solution 
-        if best: best = best if best<currentB else currentB
-        else:    best = currentB
+        if best: best = best if best<sol else sol
+        else:    best = sol
     print(f"\nSolucion no encontrada en {i} intentos")
     print(best)
 
 if __name__ == '__main__':
     seed(1)
-    N = 10
+    N = 8#10
     lateral = False
-    M = 9300
+    M = 50 #9300
     busquedaHC(N, lateral, M)
     
