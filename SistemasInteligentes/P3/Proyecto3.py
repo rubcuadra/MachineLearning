@@ -1,7 +1,9 @@
 #Ruben Cuadra A01019102
 from queue import PriorityQueue as PQ
 from random import randint, seed
+from multiprocessing import Pool
 from collections import Counter
+from os import cpu_count
 from enum import Enum
 
 class QueenMovements(Enum): 
@@ -118,38 +120,42 @@ def HC(Q,S=False):
 #Q Number of Queens (The board has size QxQ)
 #S Bool Flag that allows side movements, If True Hill Climbing algorithm allows lateral movements (Move to a node with same score)
 #T Number of tries
-def busquedaHC(Q=8,S=False,T=float("inf")):
+#IF there is no solution and T is inf then it will never end...
+def busquedaHC(Q=8,S=False,T=float("inf"), parallelize=False):
     #Compare using Side flag is <= , else is <
     print(f"Algoritmo 'Hill Climbing' {'con' if S else 'sin'} movimientos laterales")
+    found,i = None,0
+
+    #In Line or parallel
+    if parallelize: 
+        rs = 10 #10 sub procs per iteration
+        roundSize = T%rs if T != float("inf") else rs #Fix si piden numeros con residuo al dividir por 10
+        while not found and i<T:
+            pool = Pool(cpu_count()) #Parallelize crawlers
+            res = pool.starmap(HC, [(Q,S)]*roundSize ) #ir de roundSize
+            pool.close()
+            pool.join()
+            for r in res:
+                i+=1
+                if r.score == 0: found = r
+            roundSize = rs
+    else:
+        while i<T:
+            answer = HC(Q,S)
+            if answer.score == 0:
+                found = answer
+                break
+            i+=1
+    if found:
+        print(f"\nSolucion encontrada en el intento {i}")
+        print(found)
+    else:
+        print(f"\nSolucion no encontrada en {i} intentos")
     
-    # pool = Pool(cpu_count()) #Parallelize crawlers
-    # tp = tuple( product(subreddits, keyWords, [opd], [dumpType]) )
-    # pool.starmap(dumpSubredditPosts, tp ) 
-    # pool.close()
-    # pool.join()
-
-    best = None
-    i = 0
-    while T>0:
-        i,T = i+1, T-1
-        
-        sol = HC(Q,S)
-        
-        if sol.score == 0:
-            print(f"\nSolucion encontrada en el intento {i}")
-            print(sol)
-            return
-        
-        #Closest solution 
-        if best: best = best if best<sol else sol
-        else:    best = sol
-    print(f"\nSolucion no encontrada en {i} intentos")
-    print(best)
-
 if __name__ == '__main__':
     seed(1)
-    N = 8#10
+    N = 10
     lateral = False
-    M = 50 #9300
+    M = 9300
     busquedaHC(N, lateral, M)
     
