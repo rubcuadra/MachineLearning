@@ -5,7 +5,7 @@ from multiprocessing import Pool
 from collections import Counter
 from os import cpu_count
 from enum import Enum
-
+seed(1)
 class QueenMovements(Enum): 
     '''
         We only move them up and down because there's 
@@ -153,7 +153,6 @@ def busquedaHC(Q=8,S=False,T=float("inf"), parallelize=False):
         print(f"\nSolucion no encontrada en {i} intentos")
     
 if __name__ == '__main__':
-    seed(1)
     N = 10
     lateral = False
     M = 9300
