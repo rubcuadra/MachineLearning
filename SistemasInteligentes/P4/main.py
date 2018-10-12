@@ -8,7 +8,7 @@ def P1Turn(board, player): #Player
     return move
 
 def P2Turn(board, player): #IA
-    return Agent.getBestMovement(board, player, 3)
+    return Agent.getBestMovement(board, player, 2)
 
 #Nivel  => Profundidad de busqueda
 #Fichas => 0 Blancas, 1 Negras (Para la computadora) 
