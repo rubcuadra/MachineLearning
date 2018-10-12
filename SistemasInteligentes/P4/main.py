@@ -3,11 +3,12 @@ from reversi import ReversiBoard
 from random import shuffle 
 
 def P1Turn(board, player): #Player
+    # return Agent.getBestMovement(board, player, 1)
     move = input('Enter your move: ')
     return move
 
 def P2Turn(board, player): #IA
-    return Agent.getBestMovement(board, player, level=1)
+    return Agent.getBestMovement(board, player, 3)
 
 #Nivel  => Profundidad de busqueda
 #Fichas => 0 Blancas, 1 Negras (Para la computadora) 
@@ -39,7 +40,7 @@ def othello(nivel, fichas=1, inicio=1):
             if board.canPlayerMove( tokens[i] ) : 
                 print(f"{order[i]} turn, throwing {board.getSymbol(tokens[i])}")
                 while True:
-                    move = turns[i](board,tokens[i])  
+                    move = turns[i]( ReversiBoard( board.value )  ,tokens[i])  
                     if ReversiBoard.cellExists(move):
                         r = board.throw(tokens[i],move)
                         if len(r) > 0: 
