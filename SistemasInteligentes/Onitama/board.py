@@ -25,6 +25,8 @@ class OnitamaBoard():
             self._red  = extras["r"] 
             self._blue_is_alive = extras["mb"] 
             self._red_is_alive = extras["mr"] 
+            self._blue_pos = extras["mbp"] 
+            self._red_pos  =extras["mrp"] 
         else: #Initial board
             self.board = [
                 [self.RED_STUDENT] *5,
@@ -47,6 +49,8 @@ class OnitamaBoard():
             self._red  = 5
             self._blue_is_alive = True
             self._red_is_alive = True
+            self._blue_pos = (4,2)
+            self._red_pos  = (0,2)
 
     def __getitem__(self,i): return self.board[i]
 
@@ -72,6 +76,7 @@ class OnitamaBoard():
         board = list( map(list, self.board) )
         #Move token
         dest = board[toCell[0]][toCell[1]]
+        orig = board[fromCell[0]][fromCell[1]]
         board[toCell[0]][toCell[1]] = board[fromCell[0]][fromCell[1]]
         board[fromCell[0]][fromCell[1]] = self.EMPTY_CHAR
         #Update Cards
@@ -80,21 +85,23 @@ class OnitamaBoard():
         
         r,b   = self._red, self._blue
         mr,mb = self._red_is_alive, self._blue_is_alive
-
+        mbp,mrp = self._blue_pos, self._red_pos
         if player is self.BLUE: 
             B.add(SB)
             B.remove(card)
+            if orig == self.BLUE_MASTER: mbp = toCell #Update master pos
             if   dest == self.RED_MASTER: r,mr = r-1,False
             elif dest == self.RED_STUDENT:r -= 1
         else:
             R.add(SB)
             R.remove(card)
+            if orig == self.RED_MASTER: mrp = toCell #Update master pos
             if   dest == self.BLUE_MASTER:b,mb = b-1,False
             elif dest == self.BLUE_MASTER:b -= 1
         SB = card                  #Send movement to Stand By
         cards = [ B,R,SB ]         #New cards
         #Return new Board
-        return OnitamaBoard(board,cards,{"b":b,"r":r,"mb":mb,"mr":mr})
+        return OnitamaBoard(board,cards,{"b":b,"r":r,"mb":mb,"mr":mr,"mrp":mrp,"mbp":mbp})
 
     def isGameOver(self):
         f = self[0][2] == self.BLUE_MASTER or self[4][2] == self.RED_MASTER
@@ -124,6 +131,6 @@ if __name__ == '__main__':
     from random import seed
     seed(0)
     board = OnitamaBoard()
-    if board.canMove( board.RED, (0,3), "RABBIT", (1,2) ) :
-        newBoard = board.move( board.RED, (0,3), "RABBIT", (1,2) ) 
-        print(newBoard)
+    if board.canMove( board.RED, (0,2), "RABBIT", (1,1) ) :
+        newBoard = board.move( board.RED, (0,2), "RABBIT", (1,1) ) 
+        print(newBoard._red_pos)
