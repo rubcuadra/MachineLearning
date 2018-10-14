@@ -1,6 +1,5 @@
 from enum import Enum
 from movements import OnitamaCards
-from random import seed
 
 class OnitamaBoard():
     """
@@ -18,10 +17,14 @@ class OnitamaBoard():
     RED_STUDENT  = "r"
     EMPTY_CHAR   = " "
 
-    def __init__(self, board=None, cards=None):
+    def __init__(self, board=[], cards=[], extras={}):
         if board: 
             self.board = board
             self.cards = cards
+            self._blue = extras["b"] 
+            self._red  = extras["r"] 
+            self._blue_is_alive = extras["mb"] 
+            self._red_is_alive = extras["mr"] 
         else: #Initial board
             self.board = [
                 [self.RED_STUDENT] *5,
@@ -39,6 +42,11 @@ class OnitamaBoard():
                 set(cards[2:4]), #RED
                 cards[-1],
             ]
+            #For scores and game over, better to have it like this than calculating it on each move
+            self._blue = 5
+            self._red  = 5
+            self._blue_is_alive = True
+            self._red_is_alive = True
 
     def __getitem__(self,i): return self.board[i]
 
@@ -63,33 +71,35 @@ class OnitamaBoard():
     def move(self, player, fromCell, card, toCell):
         board = list( map(list, self.board) )
         #Move token
+        dest = board[toCell[0]][toCell[1]]
         board[toCell[0]][toCell[1]] = board[fromCell[0]][fromCell[1]]
         board[fromCell[0]][fromCell[1]] = self.EMPTY_CHAR
         #Update Cards
         B,R,SB = self.getCards()
         B,R    = set(B),set(R)     #Work on copies
+        
+        r,b   = self._red, self._blue
+        mr,mb = self._red_is_alive, self._blue_is_alive
+
         if player is self.BLUE: 
             B.add(SB)
             B.remove(card)
+            if   dest == self.RED_MASTER: r,mr = r-1,False
+            elif dest == self.RED_STUDENT:r -= 1
         else:
             R.add(SB)
             R.remove(card)
+            if   dest == self.BLUE_MASTER:b,mb = b-1,False
+            elif dest == self.BLUE_MASTER:b -= 1
         SB = card                  #Send movement to Stand By
         cards = [ B,R,SB ]         #New cards
         #Return new Board
-        return OnitamaBoard(board,cards)
+        return OnitamaBoard(board,cards,{"b":b,"r":r,"mb":mb,"mr":mr})
 
-    
     def isGameOver(self):
         f = self[0][2] == self.BLUE_MASTER or self[4][2] == self.RED_MASTER
         if not f: #If none arrived to the other side check if a master is gone
-            red, blue = False, False
-            for row in self:
-                for cell in row:
-                    red  |= cell==self.RED_MASTER
-                    blue |= cell==self.BLUE_MASTER
-                    if red and blue: break #Both are alive
-            return not (red and blue) #If 1 is gone then it is over
+            return not (self._red_is_alive and self._blue_is_alive)
         return True 
 
     #BLUE,RED,STAND_BY = getCards()
@@ -111,6 +121,8 @@ class OnitamaBoard():
         return toRet
 
 if __name__ == '__main__':
+    from random import seed
+    seed(0)
     board = OnitamaBoard()
     if board.canMove( board.RED, (0,3), "RABBIT", (1,2) ) :
         newBoard = board.move( board.RED, (0,3), "RABBIT", (1,2) ) 
