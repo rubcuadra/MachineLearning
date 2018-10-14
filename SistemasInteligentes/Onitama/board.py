@@ -74,12 +74,15 @@ class OnitamaBoard():
     def canMove(self, player, fromCell, card, toCell):
         fromRow, fromCol = fromCell
         toRow,     toCol = toCell
-        #Origin is player's token
-        #Destin is NOT player's token
-        #Player has that card
-        if self.isPlayer(player,self[fromRow][fromCol]) and not self.isPlayer(player,self[toRow][toCol]) and card in self.cards[player]:
-            mov = (toCell[0]-fromCell[0],toCell[1]-fromCell[1]) if player is self.BLUE else (fromCell[0]-toCell[0],fromCell[1]-toCell[1])
-            return mov in OnitamaCards[card]
+        #Checar indices
+        if fromRow > -1 and toRow > -1 and fromCol > -1 and toCol > -1 and fromRow < 5 and toRow < 5 and fromCol < 5 and toCol < 5:
+            #Checar indices origen y destino (que no se salgan)
+            #Origin is player's token
+            #Destin is NOT player's token
+            #Player has that card
+            if self.isPlayer(player,self[fromRow][fromCol]) and not self.isPlayer(player,self[toRow][toCol]) and card in self.cards[player]:
+                mov = (toCell[0]-fromCell[0],toCell[1]-fromCell[1]) if player is self.BLUE else (fromCell[0]-toCell[0],fromCell[1]-toCell[1])
+                return mov in OnitamaCards[card]
         return False
     
     #Should call canMove before, otherwise we'll have buggs
@@ -95,10 +98,10 @@ class OnitamaBoard():
         B,R,SB = self.getCards()
         B,R    = set(B),set(R)     #Work on copies
         
-        r,b   = self._red, self._blue
-        mr,mb = self._red_is_alive, self._blue_is_alive
-        mbp,mrp = self._blue_master_pos, self._red_master_pos
-        bp, rp = self._blue_pos, self._red_pos
+        r,b   = self._red, self._blue                         #int
+        mr,mb = self._red_is_alive, self._blue_is_alive       #bool
+        mbp,mrp = self._blue_master_pos, self._red_master_pos #tuple
+        bp, rp = set(self._blue_pos), set(self._red_pos)      #set of tuples
         if player is self.BLUE: 
             #Add card
             B.add(SB)
