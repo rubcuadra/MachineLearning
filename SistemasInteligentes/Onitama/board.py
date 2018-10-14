@@ -138,6 +138,60 @@ class OnitamaBoard():
 
     #BLUE,RED,STAND_BY = getCards()
     def getCards(self): return self.cards
+    
+    @staticmethod
+    def fromArgs(_str):
+        board,blueCards,redCards,standBy = _str.split(";")
+        b,p = [],0
+        extras = {"b":0,"r":0,"mb":False,"mr":False,"mbp":(),"mrp":(),"bp":set([]),"rp":set([])}
+        for i in range(5,30,5):
+            b.append([])
+            row = int(i/5 - 1)
+            for col,t in enumerate(board[p:i]):
+                if   t is OnitamaBoard.BLUE_MASTER:
+                    extras["b"]  += 1
+                    extras["mbp"] = (row,col)
+                    extras["mb"]  = True
+                elif t is OnitamaBoard.RED_MASTER:
+                    extras["r"]  += 1
+                    extras["mrp"] = (row,col)
+                    extras["mr"]  = True
+                elif t is OnitamaBoard.BLUE_STUDENT:
+                    extras["b"]  += 1
+                    extras["bp"].add( (row,col) )
+                elif t is OnitamaBoard.RED_STUDENT:
+                    extras["r"]  += 1
+                    extras["rp"].add( (row,col) )
+                b[-1].append(t) 
+            p = i
+        cards = [
+            set(blueCards.split(" ")),
+            set(redCards.split(" ")),
+            standBy
+        ]
+        return OnitamaBoard(b,cards,extras)
+
+    def __hash__(self):
+        btp = tuple( map(tuple,self.board) )  #Board
+        c1h = frozenset(self.cards[0])        #Blue Cards
+        c2h = frozenset(self.cards[1])        #Red Cards 
+        c3h = self.cards[2]                   #Stand By Card
+        return hash( (btp,c1h,c2h,c3h) )
+
+    def __eq__(self, other): #Boards and cards are the same
+        return self.board == self.board and self.cards[0] == other.cards[0] and self.cards[1] == other.cards[1] and self.cards[2] == other.cards[2]
+
+    @staticmethod
+    def toArgs(board):
+        arg = ""
+        for row in board:
+            for cell in row:
+                arg+=cell
+        arg += ";"
+        arg += " ".join( board.cards[0] ) + ";"
+        arg += " ".join( board.cards[1] ) + ";"
+        arg += board.cards[2]
+        return arg
 
     def __str__(self):
         print("BLUE")
@@ -158,6 +212,8 @@ if __name__ == '__main__':
     from random import seed
     seed(0)
     board = OnitamaBoard()
-    if board.canMove( board.RED, (0,2), "RABBIT", (1,1) ) :
-        newBoard = board.move( board.RED, (0,2), "RABBIT", (1,1) )
-        print(newBoard) 
+    # fromArgs = OnitamaBoard.fromArgs("rrRrr               bbBbb;FROG COBRA;CRAB RABBIT;MANTIS")
+    # print(OnitamaBoard.toArgs( board ))
+    # if board.canMove( board.RED, (0,2), "RABBIT", (1,1) ) :
+    #     newBoard = board.move( board.RED, (0,2), "RABBIT", (1,1) )
+    #     print(newBoard) 
