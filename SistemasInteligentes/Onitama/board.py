@@ -25,8 +25,10 @@ class OnitamaBoard():
             self._red  = extras["r"] 
             self._blue_is_alive = extras["mb"] 
             self._red_is_alive = extras["mr"] 
-            self._blue_pos = extras["mbp"] 
-            self._red_pos  =extras["mrp"] 
+            self._blue_master_pos = extras["mbp"] 
+            self._red_master_pos  = extras["mrp"] 
+            self._blue_pos = extras["bp"] 
+            self._red_pos  = extras["rp"] 
         else: #Initial board
             self.board = [
                 [self.RED_STUDENT] *5,
@@ -49,10 +51,20 @@ class OnitamaBoard():
             self._red  = 5
             self._blue_is_alive = True
             self._red_is_alive = True
-            self._blue_pos = (4,2)
-            self._red_pos  = (0,2)
+            self._blue_master_pos = (4,2)
+            self._red_master_pos  = (0,2)
+            self._blue_pos = set(( (4,0),(4,1),(4,3),(4,4) ))
+            self._red_pos  = set(( (0,0),(0,1),(0,3),(0,4) ))
+
+    #Se deberia dar por el tablero + cartas
+    # def __hash__(self):
+    #     return hash( tuple( map(tuple, self.board) ) )
 
     def __getitem__(self,i): return self.board[i]
+
+    @classmethod
+    def getOpponent(cls,player):
+        return cls.RED if player is cls.BLUE else cls.BLUE
 
     @classmethod
     def isPlayer(cls,player,token):
@@ -85,23 +97,35 @@ class OnitamaBoard():
         
         r,b   = self._red, self._blue
         mr,mb = self._red_is_alive, self._blue_is_alive
-        mbp,mrp = self._blue_pos, self._red_pos
+        mbp,mrp = self._blue_master_pos, self._red_master_pos
+        bp, rp = self._blue_pos, self._red_pos
         if player is self.BLUE: 
+            #Add card
             B.add(SB)
             B.remove(card)
-            if orig == self.BLUE_MASTER: mbp = toCell #Update master pos
+            #Update master position
+            if orig == self.BLUE_MASTER: mbp = toCell 
+            else: #Update students positons
+                bp.add(toCell)
+                bp.remove(fromCell)
+            #Update pieces count
             if   dest == self.RED_MASTER: r,mr = r-1,False
             elif dest == self.RED_STUDENT:r -= 1
         else:
             R.add(SB)
             R.remove(card)
-            if orig == self.RED_MASTER: mrp = toCell #Update master pos
+            #Update master position
+            if orig == self.RED_MASTER: mrp = toCell 
+            else: #Update students positons
+                rp.add(toCell)
+                rp.remove(fromCell)
+            #Update pieces count
             if   dest == self.BLUE_MASTER:b,mb = b-1,False
             elif dest == self.BLUE_MASTER:b -= 1
         SB = card                  #Send movement to Stand By
         cards = [ B,R,SB ]         #New cards
         #Return new Board
-        return OnitamaBoard(board,cards,{"b":b,"r":r,"mb":mb,"mr":mr,"mrp":mrp,"mbp":mbp})
+        return OnitamaBoard(board,cards,{"b":b,"r":r,"mb":mb,"mr":mr,"mrp":mrp,"mbp":mbp,"bp":bp,"rp":rp})
 
     def isGameOver(self):
         f = self[0][2] == self.BLUE_MASTER or self[4][2] == self.RED_MASTER
@@ -132,5 +156,5 @@ if __name__ == '__main__':
     seed(0)
     board = OnitamaBoard()
     if board.canMove( board.RED, (0,2), "RABBIT", (1,1) ) :
-        newBoard = board.move( board.RED, (0,2), "RABBIT", (1,1) ) 
-        print(newBoard._red_pos)
+        newBoard = board.move( board.RED, (0,2), "RABBIT", (1,1) )
+        print(newBoard) 
