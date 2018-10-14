@@ -24,5 +24,4 @@ if __name__ == '__main__':
             raise
         print("BLUE",movement)
         print(board)
-
     print(f"Winner is { 'BLUE' if board._blue_is_alive else 'RED' }")
