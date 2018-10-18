@@ -1,4 +1,3 @@
-#Uncomment line 7 and 20 for AI vs AI (P2 will win)
 from reversi_player import Agent
 from reversi import ReversiBoard
 from random import shuffle 
@@ -17,7 +16,7 @@ def P2Turn(board, player): #IA
 #Inicia => 0 Computadora, 1 Contrario 
 def othello(nivel, fichas=1, inicio=1):
     global _agent1,_agent2
-    # _agent1 = Agent(1)         #Crear agente para P1
+    _agent1 = Agent(1)         #Crear agente para P1
     _agent2 = Agent(nivel)     #Crear agente para P2
 
     #P2 is the computer
@@ -38,11 +37,10 @@ def othello(nivel, fichas=1, inicio=1):
         tokens = [board.P1,board.P2] if fichas == 0 else [board.P2,board.P1]
     
     while not ReversiBoard.isGameOver(board):    
-        P1Score = board.score( board.P1 )
-        P2Score = board.score( board.P2 )
-        print("Scores:\t",f"{board.P1S}:{P1Score}","\t",f"{board.P2S}:{P2Score}")
-        
         for i in range(2):
+            P1Score = board.score( board.P1 )
+            P2Score = board.score( board.P2 )
+            print("Scores:\t",f"{board.P1S}:{P1Score}","\t",f"{board.P2S}:{P2Score}")
             if board.canPlayerMove( tokens[i] ) : 
                 print(f"{order[i]} turn, throwing {board.getSymbol(tokens[i])}")
                 while True:
@@ -58,10 +56,10 @@ def othello(nivel, fichas=1, inicio=1):
                 print(board)
 
     if P1Score == P2Score: print("TIE !!")
-    else:                  print(f"Winner is {board.P1 if P1Score>P2Score else board.P2}")
+    else:                  print(f"Winner is {board.P1S if P1Score>P2Score else board.P2S}")
 
 if __name__ == '__main__':
     level  = 2 #Dificultad de la AI
-    npc    = 1 #Fichas del P2(AI). 0 es Blancas
-    starts = 0 #0 => P2 (AI) empieza
+    npc    = 0 #Fichas del P2(AI). 0 es Blancas
+    starts = 1 #0 => P2 (AI) empieza
     othello(level,npc,starts)

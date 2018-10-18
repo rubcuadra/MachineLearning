@@ -26,7 +26,7 @@ class BoardNode(object):
 
     #Heuristic
     def getScore(self): #Quiza se deberia mejorar
-        return self.board.score(self.player)
+        return self.board.score(self.player) #- self.board.score(ReversiBoard.getOpponent(self.player))
 
     #For Max and Min
     def __lt__(self,other):
@@ -55,6 +55,6 @@ class Agent():
         mx = ("D6", float("-inf"))
         for ch in root.children:
             score = BoardNode.MM(ch, 1 + (self.level-1)*2 )
-            # print(score)
-            if score > mx[1]: mx = ( ch.cell, score )    
+            if score > mx[1]: 
+                mx = ( ch.cell, score )    
         return mx[0]
