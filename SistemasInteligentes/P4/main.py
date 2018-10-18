@@ -1,19 +1,25 @@
+#Uncomment line 7 and 20 for AI vs AI (P2 will win)
 from reversi_player import Agent
 from reversi import ReversiBoard
 from random import shuffle 
 
+_agent1,_agent2 = None,None 
 def P1Turn(board, player): #Player
-    # return Agent.getBestMovement(board, player, 1)
+    # return _agent1.getBestMovement(board, player) #Jugar AI vs AI
     move = input('Enter your move: ')
     return move
 
 def P2Turn(board, player): #IA
-    return Agent.getBestMovement(board, player, 2)
+    return _agent2.getBestMovement(board, player) 
 
 #Nivel  => Profundidad de busqueda
 #Fichas => 0 Blancas, 1 Negras (Para la computadora) 
 #Inicia => 0 Computadora, 1 Contrario 
 def othello(nivel, fichas=1, inicio=1):
+    global _agent1,_agent2
+    # _agent1 = Agent(1)         #Crear agente para P1
+    _agent2 = Agent(nivel)     #Crear agente para P2
+
     #P2 is the computer
     board = ReversiBoard()
     print("=== GAME STARTED ===")
@@ -56,6 +62,6 @@ def othello(nivel, fichas=1, inicio=1):
 
 if __name__ == '__main__':
     level  = 2 #Dificultad de la AI
-    npc    = 0 #Fichas del P2(AI). 0 es Blancas
+    npc    = 1 #Fichas del P2(AI). 0 es Blancas
     starts = 0 #0 => P2 (AI) empieza
     othello(level,npc,starts)

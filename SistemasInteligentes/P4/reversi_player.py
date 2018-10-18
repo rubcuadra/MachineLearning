@@ -43,16 +43,18 @@ class BoardNode(object):
                 return min( [ BoardNode.MM(c,level-1) for c in node.children ] ) 
         return node.score #Se intento expandir pero ya no se puede
 
-class Agent(object):
-    @staticmethod
-    def getBestMovement(board, player, level=1): #Level 1 = Expande 1 tiro nuestro y 1 de oponente
+class Agent():
+    def __init__(self, level):
+        self.level = level
+
+    def getBestMovement(self, board, player): #Level 1 = Expande 1 tiro nuestro y 1 de oponente
         root = BoardNode(board,player)    #Root
         root.updateChildren()             #First Layer, get Max
     
         #Get Max but save the movement
         mx = ("D6", float("-inf"))
         for ch in root.children:
-            score = BoardNode.MM(ch, 1 + (level-1)*2 )
-            print(score)
+            score = BoardNode.MM(ch, 1 + (self.level-1)*2 )
+            # print(score)
             if score > mx[1]: mx = ( ch.cell, score )    
         return mx[0]
