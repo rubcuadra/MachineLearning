@@ -56,5 +56,6 @@ class Agent():
         for ch in root.children:
             score = BoardNode.MM(ch, 1 + (self.level-1)*2 )
             if score > mx[1]: 
-                mx = ( ch.cell, score )    
+                mx = ( ch.cell, score )   
+
         return mx[0]

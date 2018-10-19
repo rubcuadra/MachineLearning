@@ -2,9 +2,8 @@ from reversi_player import Agent
 from reversi import ReversiBoard
 from random import shuffle 
 
-_agent1,_agent2 = None,None 
+_agent2 = None
 def P1Turn(board, player): #Player
-    # return _agent1.getBestMovement(board, player) #Jugar AI vs AI
     move = input('Enter your move: ')
     return move
 
@@ -15,8 +14,7 @@ def P2Turn(board, player): #IA
 #Fichas => 0 Blancas, 1 Negras (Para la computadora) 
 #Inicia => 0 Computadora, 1 Contrario 
 def othello(nivel, fichas=1, inicio=1):
-    global _agent1,_agent2
-    _agent1 = Agent(1)         #Crear agente para P1
+    global _agent2
     _agent2 = Agent(nivel)     #Crear agente para P2
 
     #P2 is the computer
@@ -51,8 +49,7 @@ def othello(nivel, fichas=1, inicio=1):
                             print(f"Selection: {move}")
                             board.doUpdate(tokens[i],r)
                             break
-                        else: 
-                            print("Wrong movement, try again")
+                    print("Wrong movement, try again")
                 print(board)
 
     if P1Score == P2Score: print("TIE !!")
